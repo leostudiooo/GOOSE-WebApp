@@ -1,0 +1,81 @@
+{
+  "routes": [
+    {
+      "routeName": "丁家桥体育场",
+      "ruleId": "403640128840458304",
+      "planId": "403640128840458306",
+      "routeRule": "丁家桥校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    },
+    {
+      "routeName": "四牌楼体育场",
+      "ruleId": "403640128840458519",
+      "planId": "403640128840458521",
+      "routeRule": "四牌楼校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    },
+    {
+      "routeName": "小营田径场",
+      "ruleId": "403640128840458519",
+      "planId": "403640128840458727",
+      "routeRule": "四牌楼校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    },
+    {
+      "routeName": "无锡国际校区体育馆",
+      "ruleId": "482716833313089537",
+      "planId": "405863869632939014",
+      "routeRule": "无锡国际校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    },
+    {
+      "routeName": "桃园田径场",
+      "ruleId": "402186368309502988",
+      "planId": "403640124545491473",
+      "routeRule": "九龙湖校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    },
+    {
+      "routeName": "梅园田径场",
+      "ruleId": "402186368309502988",
+      "planId": "403640115955556355",
+      "routeRule": "九龙湖校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    },
+    {
+      "routeName": "橘园田径场",
+      "ruleId": "402186368309502988",
+      "planId": "403640124545491749",
+      "routeRule": "九龙湖校区",
+      "maxTime": 12,
+      "minTime": 4,
+      "routeDistanceKm": 1.2,
+      "ruleEndTime": "22:00",
+      "ruleStartTime": "06:00"
+    }
+  ]
+}
