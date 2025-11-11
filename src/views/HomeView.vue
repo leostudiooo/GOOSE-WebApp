@@ -72,6 +72,7 @@ import { VerificationService } from '@/services/verificationService'
 import { UploadService, type UploadProgress } from '@/services/uploadService'
 import { useToast } from 'vue-toastification'
 import type { Track, TrackPoint } from '@/types'
+import { getMaskedUserInfo } from '@/utils/privacyHelper'
 
 const configStore = useConfigStore()
 const userStore = useUserStore()
@@ -156,14 +157,20 @@ async function handleValidation() {
 
     if (result.isValid) {
       let successMessage = '配置验证通过！用户信息：'
-      if (result.name) {
-        successMessage += `\n${result.name}`
+      // 使用 masked data 显示敏感信息
+      const maskedInfo = getMaskedUserInfo({
+        name: result.name || '',
+        account: result.account || '',
+        studentId: result.studentId || ''
+      })
+      if (maskedInfo.maskedName) {
+        successMessage += `\n${maskedInfo.maskedName}`
       }
-      if (result.account) {
-        successMessage += `\n${result.account}`
+      if (maskedInfo.maskedAccount) {
+        successMessage += `\n${maskedInfo.maskedAccount}`
       }
-      if (result.studentId) {
-        successMessage += `\n${result.studentId}`
+      if (maskedInfo.maskedStudentId) {
+        successMessage += `\n${maskedInfo.maskedStudentId}`
       }
       validationResult.value = successMessage
       toast.success(successMessage)
@@ -216,7 +223,9 @@ async function handleUpload() {
       userStore.user,
       configStore.headers,
       selectedRoute,
-      trackData
+      trackData,
+      userStore.startImageFile!,
+      userStore.finishImageFile!
     )
 
     if (result.success) {

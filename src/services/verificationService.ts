@@ -1,6 +1,5 @@
 import { APIClient } from './api'
 import { getUserInfo } from '@/utils/tokenDecoder'
-import { getMaskedUserInfo } from '@/utils/privacyHelper'
 import type { Headers, User } from '@/types'
 
 export interface VerificationResult {
@@ -22,18 +21,11 @@ export class VerificationService {
       
       const userInfo = getUserInfo(token)
       
-      // 获取隐私化后的用户信息
-      const maskedInfo = getMaskedUserInfo({
-        name: userInfo.name,
-        account: userInfo.account,
-        studentId: userInfo.studentId
-      })
-      
       return {
         isValid: true,
-        studentId: maskedInfo.maskedStudentId,
-        name: maskedInfo.maskedName,
-        account: maskedInfo.maskedAccount
+        studentId: userInfo.studentId,  // 返回原始 studentId 用于 API 认证
+        name: userInfo.name,
+        account: userInfo.account
       }
     } catch (error) {
       return {
