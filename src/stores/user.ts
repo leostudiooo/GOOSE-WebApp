@@ -78,7 +78,7 @@ export const useUserStore = defineStore('user', () => {
     customTrackData.value = track
     user.value.customTrack.enable = true
     user.value.customTrack.filePath = 'custom'
-    
+
     // Don't automatically change the route - let user keep their selected venue
   }
 

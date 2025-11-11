@@ -8,8 +8,8 @@
         @change="handleFileChange"
         class="file-input"
       />
-      <label 
-        :for="`file-${id}`" 
+      <label
+        :for="`file-${id}`"
         class="upload-label"
         @drop.prevent="handleDrop"
         @dragover.prevent="handleDragOver"
@@ -74,7 +74,7 @@ function handleDrop(event: DragEvent) {
   preventDefaults(event)
   dragCounter = 0
   isDragOver.value = false
-  
+
   const files = event.dataTransfer?.files
   if (files && files[0] && files[0].type.startsWith('image/')) {
     processFile(files[0])
@@ -105,9 +105,10 @@ function handleDragLeave(event: DragEvent) {
 <style scoped>
 .image-uploader {
   margin-bottom: 25px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
-
 
 .upload-area {
   position: relative;
@@ -166,7 +167,6 @@ function handleDragLeave(event: DragEvent) {
   color: rgba(255, 255, 255, 0.9);
 }
 
-
 @media (min-width: 640px) {
   .upload-label {
     min-height: 180px;
@@ -176,7 +176,6 @@ function handleDragLeave(event: DragEvent) {
   .image-uploader {
     margin-bottom: 30px;
   }
-
 
   .placeholder span {
     font-size: 48px;
@@ -201,7 +200,9 @@ function handleDragLeave(event: DragEvent) {
 .placeholder p {
   margin: 0 0 8px 0;
   font-size: 13px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -209,7 +210,9 @@ function handleDragLeave(event: DragEvent) {
 .placeholder small {
   font-size: 11px;
   color: var(--color-text-muted);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   margin: 0;
 }
 
@@ -224,7 +227,9 @@ function handleDragLeave(event: DragEvent) {
   padding: 6px 10px;
   font-size: 12px;
   color: var(--color-text-muted);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   word-break: break-all;

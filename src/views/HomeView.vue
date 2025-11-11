@@ -1,63 +1,75 @@
 <template>
   <div class="home-view">
     <div class="app-window">
-        <div class="titlebar">
-          <div class="window-controls">
-            <div class="traffic-lights">
-              <span class="traffic-light close"></span>
-              <span class="traffic-light minimize"></span>
-              <span class="traffic-light maximize"></span>
-            </div>
-          </div>
-          <div class="titlebar-center">
-            <span class="logo-emoji">🪿</span>
-            <span class="title">GOOSE</span>
-          </div>
-          <button @click="toggleTheme" class="theme-toggle" :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
-            {{ isDark ? '☀️' : '🌙' }}
-          </button>
-        </div>
-
-        <div class="window-content">
-          <div class="content-columns">
-            <div class="column config-column">
-              <UserConfigForm />
-            </div>
-            <div class="column upload-column">
-              <Transition name="component-fade" mode="out-in">
-                <TrackSelector v-if="!showPRTSTracker"
-                  key="track-selector"
-                  @showPRTS="handleShowPRTS" />
-                <div v-else
-                  key="prts-tracker"
-                  class="prts-wrapper">
-                  <PRTSTracker
-                    :route-name="userStore.user.route"
-                    :load-route-boundary="loadRouteBoundary"
-                    @close="handleClosePRTS"
-                    @importTrack="handleImportTrack"
-                  />
-                </div>
-              </Transition>
-            </div>
+      <div class="titlebar">
+        <div class="window-controls">
+          <div class="traffic-lights">
+            <span class="traffic-light close"></span>
+            <span class="traffic-light minimize"></span>
+            <span class="traffic-light maximize"></span>
           </div>
         </div>
+        <div class="titlebar-center">
+          <span class="logo-emoji">🪿</span>
+          <span class="title">GOOSE</span>
+        </div>
+        <button
+          @click="toggleTheme"
+          class="theme-toggle"
+          :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+        >
+          {{ isDark ? '☀️' : '🌙' }}
+        </button>
+      </div>
 
-        <!-- Upload controls at bottom of window -->
-        <div class="upload-controls">
-          <button @click="handleValidation" class="upload-btn validation-btn" :disabled="!canValidate || isValidating">
-            {{ isValidating ? '验证中...' : '验证配置' }}
-          </button>
-          <button @click="handleUpload" class="upload-btn upload-btn-main" :disabled="!canUpload || isUploading">
-            {{ isUploading ? '上传中...' : '上传记录' }}
-          </button>
+      <div class="window-content">
+        <div class="content-columns">
+          <div class="column config-column">
+            <UserConfigForm />
+          </div>
+          <div class="column upload-column">
+            <Transition name="component-fade" mode="out-in">
+              <TrackSelector
+                v-if="!showPRTSTracker"
+                key="track-selector"
+                @showPRTS="handleShowPRTS"
+              />
+              <div v-else key="prts-tracker" class="prts-wrapper">
+                <PRTSTracker
+                  :route-name="userStore.user.route"
+                  :load-route-boundary="loadRouteBoundary"
+                  @close="handleClosePRTS"
+                  @importTrack="handleImportTrack"
+                />
+              </div>
+            </Transition>
+          </div>
         </div>
       </div>
 
+      <!-- Upload controls at bottom of window -->
+      <div class="upload-controls">
+        <button
+          @click="handleValidation"
+          class="upload-btn validation-btn"
+          :disabled="!canValidate || isValidating"
+        >
+          {{ isValidating ? '验证中...' : '验证配置' }}
+        </button>
+        <button
+          @click="handleUpload"
+          class="upload-btn upload-btn-main"
+          :disabled="!canUpload || isUploading"
+        >
+          {{ isUploading ? '上传中...' : '上传记录' }}
+        </button>
+      </div>
+    </div>
+
     <footer class="footer">
       <p>
-        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a> 项目开发
-        | GPL-3.0 License
+        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a> 项目开发 |
+        GPL-3.0 License
       </p>
       <p class="warning">
         ⚠️ 本软件按"原样"提供，不附带任何担保。用户应对其上传的数据承担全部责任。
@@ -77,6 +89,7 @@ import PRTSTracker from '@/components/PRTSTracker.vue'
 import { loadRouteBoundary } from '@/utils/boundaryLoader'
 import { VerificationService } from '@/services/verificationService'
 import { UploadService, type UploadProgress } from '@/services/uploadService'
+import { APIClient } from '@/services/api'
 import { useToast } from 'vue-toastification'
 import type { Track } from '@/types'
 import { getMaskedUserInfo } from '@/utils/privacyHelper'
@@ -92,16 +105,19 @@ const isUploading = ref(false)
 const uploadProgress = ref<UploadProgress | null>(null)
 const validationResult = ref<string>('')
 const isTokenValidated = ref(false) // 跟踪 token 是否已成功验证
-const validatedApiClient = ref<any>(null) // 存储已验证的 API client
+const validatedApiClient = ref<APIClient | null>(null) // 存储已验证的 API client
 const validatedStudentId = ref<string>('') // 存储已验证的学生ID
 
 // 监听 token 变化，重置验证状态
-watch(() => userStore.user.token, () => {
-  isTokenValidated.value = false
-  validationResult.value = ''
-  validatedApiClient.value = null
-  validatedStudentId.value = ''
-})
+watch(
+  () => userStore.user.token,
+  () => {
+    isTokenValidated.value = false
+    validationResult.value = ''
+    validatedApiClient.value = null
+    validatedStudentId.value = ''
+  },
+)
 
 const isDark = computed(() => {
   if (theme.value === 'auto') {
@@ -148,17 +164,14 @@ const canValidate = computed(() => {
 
 const canUpload = computed(() => {
   // 上传需要所有字段完整
-  const hasBasicFields = (
+  const hasBasicFields =
     userStore.user.token &&
     userStore.startImageFile &&
     userStore.finishImageFile &&
     userStore.user.route
-  )
 
   // 如果启用了自定义轨迹，还需要有轨迹数据
-  const hasTrackData = userStore.user.customTrack.enable ?
-    !!userStore.customTrackData :
-    true // 默认轨迹不需要额外检查
+  const hasTrackData = userStore.user.customTrack.enable ? !!userStore.customTrackData : true // 默认轨迹不需要额外检查
 
   // 必须已经成功验证过 token
   return hasBasicFields && hasTrackData && isTokenValidated.value
@@ -182,10 +195,7 @@ async function handleValidation() {
       else if (type === 'error') toast.error(message)
     })
 
-    const result = await verificationService.validateTokenOnly(
-      userStore.user,
-      configStore.headers
-    )
+    const result = await verificationService.validateTokenOnly(userStore.user, configStore.headers)
 
     if (result.isValid) {
       isTokenValidated.value = true // 标记为已验证
@@ -199,7 +209,7 @@ async function handleValidation() {
       const maskedInfo = getMaskedUserInfo({
         name: result.name || '',
         account: result.account || '',
-        studentId: result.studentId || ''
+        studentId: result.studentId || '',
       })
       if (maskedInfo.maskedName) {
         successMessage += `\n${maskedInfo.maskedName}`
@@ -280,11 +290,11 @@ async function handleUpload() {
         if (type === 'info') toast.info(message)
         else if (type === 'success') toast.success(message)
         else if (type === 'error') toast.error(message)
-      }
+      },
     )
 
     // Get the selected route
-    const selectedRoute = routeStore.routes.find(r => r.routeName === userStore.user.route)
+    const selectedRoute = routeStore.routes.find((r) => r.routeName === userStore.user.route)
     if (!selectedRoute) {
       throw new Error('未找到选定的运动场地')
     }
@@ -300,13 +310,13 @@ async function handleUpload() {
     }
 
     const result = await uploadService.uploadExerciseRecord(
-      validatedApiClient.value,
+      validatedApiClient.value as APIClient,
       validatedStudentId.value,
       userStore.user,
       selectedRoute,
       trackData,
       userStore.startImageFile!,
-      userStore.finishImageFile!
+      userStore.finishImageFile!,
     )
 
     if (result.success) {
@@ -353,7 +363,6 @@ function handleImportTrack(track: Track) {
   // Hide PRTS tracker
   showPRTSTracker.value = false
 }
-
 </script>
 
 <style scoped>
@@ -373,7 +382,9 @@ function handleImportTrack(track: Track) {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border-subtle);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 4px 8px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
   overflow: hidden;
   flex: 1;
@@ -404,7 +415,9 @@ function handleImportTrack(track: Track) {
 .title {
   font-size: 14px;
   font-weight: bold;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -423,7 +436,9 @@ function handleImportTrack(track: Track) {
   cursor: pointer;
   font-size: 12px;
   transition: all 0.2s;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   min-width: 28px;
   height: 24px;
   display: flex;
@@ -521,7 +536,9 @@ function handleImportTrack(track: Track) {
   color: var(--color-text-muted);
   font-size: 11px;
   max-width: 2000px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   padding: 20px;
   flex-shrink: 0;
 }
@@ -709,7 +726,9 @@ function handleImportTrack(track: Track) {
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.2s;
@@ -749,7 +768,4 @@ function handleImportTrack(track: Track) {
   cursor: not-allowed;
   opacity: 0.5;
 }
-
-
-
 </style>

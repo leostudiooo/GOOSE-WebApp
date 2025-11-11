@@ -23,21 +23,21 @@ export class VerificationService {
   async verifyToken(token: string, headers: Headers): Promise<VerificationResult> {
     try {
       this.apiClient = new APIClient(headers, token)
-      
+
       await this.apiClient.checkToken()
-      
+
       const userInfo = getUserInfo(token)
-      
+
       return {
         isValid: true,
-        studentId: userInfo.studentId,  // 返回原始 studentId 用于 API 认证
+        studentId: userInfo.studentId, // 返回原始 studentId 用于 API 认证
         name: userInfo.name,
-        account: userInfo.account
+        account: userInfo.account,
       }
     } catch (error) {
       return {
         isValid: false,
-        error: error instanceof Error ? error.message : 'Token verification failed'
+        error: error instanceof Error ? error.message : 'Token verification failed',
       }
     }
   }
@@ -45,16 +45,16 @@ export class VerificationService {
   async verifyTenant(tenant: string, headers: Headers, token: string): Promise<VerificationResult> {
     try {
       this.apiClient = new APIClient(headers, token)
-      
+
       await this.apiClient.checkTenant(tenant)
-      
+
       return {
-        isValid: true
+        isValid: true,
       }
     } catch (error) {
       return {
         isValid: false,
-        error: error instanceof Error ? error.message : 'Tenant verification failed'
+        error: error instanceof Error ? error.message : 'Tenant verification failed',
       }
     }
   }
@@ -62,12 +62,12 @@ export class VerificationService {
   // 只验证 token 的轻量级验证，用于配置验证
   async validateTokenOnly(user: User, headers: Headers): Promise<VerificationResult> {
     this.toastCallback?.('检查 Token...', 'info')
-    
+
     if (!user.token) {
       this.toastCallback?.('Token 未填写', 'error')
       return {
         isValid: false,
-        error: 'Token is required'
+        error: 'Token is required',
       }
     }
 
@@ -89,19 +89,19 @@ export class VerificationService {
       isValid: true,
       studentId: tokenResult.studentId,
       name: tokenResult.name,
-      account: tokenResult.account
+      account: tokenResult.account,
     }
   }
 
   // 验证所有上传必需的字段
   async validateUserConfig(user: User, headers: Headers): Promise<VerificationResult> {
     this.toastCallback?.('检查必填字段...', 'info')
-    
+
     if (!user.token) {
       this.toastCallback?.('Token 未填写', 'error')
       return {
         isValid: false,
-        error: 'Token is required'
+        error: 'Token is required',
       }
     }
 
@@ -109,7 +109,7 @@ export class VerificationService {
       this.toastCallback?.('请选择运动场馆', 'error')
       return {
         isValid: false,
-        error: 'Route selection is required'
+        error: 'Route selection is required',
       }
     }
 
@@ -117,7 +117,7 @@ export class VerificationService {
       this.toastCallback?.('请上传开始图片', 'error')
       return {
         isValid: false,
-        error: 'Start image is required'
+        error: 'Start image is required',
       }
     }
 
@@ -125,7 +125,7 @@ export class VerificationService {
       this.toastCallback?.('请上传结束图片', 'error')
       return {
         isValid: false,
-        error: 'Finish image is required'
+        error: 'Finish image is required',
       }
     }
 
@@ -147,7 +147,7 @@ export class VerificationService {
       isValid: true,
       studentId: tokenResult.studentId,
       name: tokenResult.name,
-      account: tokenResult.account
+      account: tokenResult.account,
     }
   }
 

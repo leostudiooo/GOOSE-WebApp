@@ -2,68 +2,85 @@
   <div class="track-selector">
     <h3>[ 轨迹选择 ]</h3>
     <div class="track-content">
-
-    <div class="radio-group">
-      <label class="radio-option">
-        <input type="radio" name="trackType" value="default" v-model="trackType" @change="useDefaultTrack" />
-        <span class="radio-label">使用默认轨迹</span>
-      </label>
-      <label class="radio-option">
-        <input type="radio" name="trackType" value="custom" v-model="trackType" @change="enableCustom" />
-        <span class="radio-label">使用自定义轨迹</span>
-      </label>
-    </div>
-
-
-    <div v-if="userStore.user.customTrack.enable" class="custom-track-options">
-      <!-- Draw Tool Button - Always visible when custom track is enabled -->
-      <div class="draw-tool-section">
-        <span class="draw-tool-hint">绘制新轨迹或编辑现有轨迹</span>
-        <button @click="openPRTSDrawer" class="btn-draw-large" :disabled="isLoadingBoundary">
-          <span v-if="isLoadingBoundary">🔄 加载中...</span>
-          <span v-else>🎨 打开绘图工具</span>
-        </button>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input
+            type="radio"
+            name="trackType"
+            value="default"
+            v-model="trackType"
+            @change="useDefaultTrack"
+          />
+          <span class="radio-label">使用默认轨迹</span>
+        </label>
+        <label class="radio-option">
+          <input
+            type="radio"
+            name="trackType"
+            value="custom"
+            v-model="trackType"
+            @change="enableCustom"
+          />
+          <span class="radio-label">使用自定义轨迹</span>
+        </label>
       </div>
 
-      <!-- Upload Section -->
-      <div class="upload-section">
-        <div class="upload-area"
-             @drop.prevent="handleDrop"
-             @dragover.prevent="handleDragOver"
-             @dragenter.prevent="handleDragEnter"
-             @dragleave.prevent="handleDragLeave"
-             :class="{ 'drag-over': isDragOver }">
+      <div v-if="userStore.user.customTrack.enable" class="custom-track-options">
+        <!-- Draw Tool Button - Always visible when custom track is enabled -->
+        <div class="draw-tool-section">
+          <span class="draw-tool-hint">绘制新轨迹或编辑现有轨迹</span>
+          <button @click="openPRTSDrawer" class="btn-draw-large" :disabled="isLoadingBoundary">
+            <span v-if="isLoadingBoundary">🔄 加载中...</span>
+            <span v-else>🎨 打开绘图工具</span>
+          </button>
+        </div>
 
-          <input id="track-file" type="file" accept="application/json,.json" @change="handleTrackFile"
-            class="file-input" />
+        <!-- Upload Section -->
+        <div class="upload-section">
+          <div
+            class="upload-area"
+            @drop.prevent="handleDrop"
+            @dragover.prevent="handleDragOver"
+            @dragenter.prevent="handleDragEnter"
+            @dragleave.prevent="handleDragLeave"
+            :class="{ 'drag-over': isDragOver }"
+          >
+            <input
+              id="track-file"
+              type="file"
+              accept="application/json,.json"
+              @change="handleTrackFile"
+              class="file-input"
+            />
 
-          <!-- Show upload interface when no track loaded -->
-          <label v-if="!userStore.customTrackData" for="track-file" class="upload-label">
-            <div class="upload-placeholder">
-              <span>📁</span>
-              <p>轨迹文件</p>
-              <small>点击选择或拖拽 JSON 文件到此处</small>
-            </div>
-          </label>
-
-          <!-- Show track info when track is loaded -->
-          <div v-else class="track-loaded">
-            <div class="track-info-display">
-              <span class="track-icon">🏟️</span>
-              <div class="track-details">
-                <p class="track-name">{{ trackFileName || '已加载轨迹' }}</p>
-                <small class="track-stats">
-                  {{ userStore.customTrackData.track.length }} 个点 · {{ userStore.customTrackData.metadata.formattedDistance }}
-                </small>
+            <!-- Show upload interface when no track loaded -->
+            <label v-if="!userStore.customTrackData" for="track-file" class="upload-label">
+              <div class="upload-placeholder">
+                <span>📁</span>
+                <p>轨迹文件</p>
+                <small>点击选择或拖拽 JSON 文件到此处</small>
               </div>
-              <button @click="clearCustomTrack" class="btn-clear-compact" title="清除轨迹">
-                🗑️ 清除
-              </button>
+            </label>
+
+            <!-- Show track info when track is loaded -->
+            <div v-else class="track-loaded">
+              <div class="track-info-display">
+                <span class="track-icon">🏟️</span>
+                <div class="track-details">
+                  <p class="track-name">{{ trackFileName || '已加载轨迹' }}</p>
+                  <small class="track-stats">
+                    {{ userStore.customTrackData.track.length }} 个点 ·
+                    {{ userStore.customTrackData.metadata.formattedDistance }}
+                  </small>
+                </div>
+                <button @click="clearCustomTrack" class="btn-clear-compact" title="清除轨迹">
+                  🗑️ 清除
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   </div>
 </template>
@@ -72,7 +89,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import type { Track } from '@/types'
-
 
 const userStore = useUserStore()
 const trackFileName = ref<string>('')
@@ -117,7 +133,6 @@ function openPRTSDrawer() {
   console.log('TrackSelector: showPRTS event emitted')
 }
 
-
 // Auto-load PRTS track from localStorage
 function loadPRTSTrackFromStorage() {
   try {
@@ -125,16 +140,22 @@ function loadPRTSTrackFromStorage() {
     if (!saved) return false
 
     const saveData = JSON.parse(saved)
-    if (!saveData.pathPoints || !Array.isArray(saveData.pathPoints) || saveData.pathPoints.length === 0) {
+    if (
+      !saveData.pathPoints ||
+      !Array.isArray(saveData.pathPoints) ||
+      saveData.pathPoints.length === 0
+    ) {
       return false
     }
 
     // Convert PRTS path points to Track format
-    const trackPoints = saveData.pathPoints.map((point: { lat: number; lng: number; sortNum: number }, index: number) => ({
-      lat: point.lat,
-      lng: point.lng,
-      sortNum: index + 1
-    }))
+    const trackPoints = saveData.pathPoints.map(
+      (point: { lat: number; lng: number; sortNum: number }, index: number) => ({
+        lat: point.lat,
+        lng: point.lng,
+        sortNum: index + 1,
+      }),
+    )
 
     // Calculate basic metadata
     let totalDistance = 0
@@ -149,24 +170,34 @@ function loadPRTSTrackFromStorage() {
 
     const metadata = {
       totalDistance,
-      formattedDistance: totalDistance < 1000 ? `${totalDistance.toFixed(0)} m` : `${(totalDistance / 1000).toFixed(2)} km`,
+      formattedDistance:
+        totalDistance < 1000
+          ? `${totalDistance.toFixed(0)} m`
+          : `${(totalDistance / 1000).toFixed(2)} km`,
       totalTime,
-      formattedTime: totalTime >= 60 ? `${Math.floor(totalTime / 60)} 分 ${totalTime % 60} 秒` : `${totalTime} 秒`,
+      formattedTime:
+        totalTime >= 60
+          ? `${Math.floor(totalTime / 60)} 分 ${totalTime % 60} 秒`
+          : `${totalTime} 秒`,
       sampleTimeInterval: sampleInterval,
       pointCount: trackPoints.length,
-      createdAt: saveData.savedAt || new Date().toISOString()
+      createdAt: saveData.savedAt || new Date().toISOString(),
     }
 
     const track: Track = {
       track: trackPoints,
-      metadata
+      metadata,
     }
 
     // Auto-enable custom track with loaded data
     userStore.enableCustomTrack(track)
     trackFileName.value = `本地轨迹 (${new Date(metadata.createdAt).toLocaleString()})`
 
-    console.log('TrackSelector: Auto-loaded PRTS track from localStorage:', trackPoints.length, 'points')
+    console.log(
+      'TrackSelector: Auto-loaded PRTS track from localStorage:',
+      trackPoints.length,
+      'points',
+    )
     return true
   } catch (error) {
     console.warn('TrackSelector: Failed to load PRTS track from localStorage:', error)
@@ -177,15 +208,15 @@ function loadPRTSTrackFromStorage() {
 // Simple distance calculation (Haversine formula)
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371000 // Earth's radius in meters
-  const φ1 = lat1 * Math.PI / 180
-  const φ2 = lat2 * Math.PI / 180
-  const Δφ = (lat2 - lat1) * Math.PI / 180
-  const Δλ = (lng2 - lng1) * Math.PI / 180
+  const φ1 = (lat1 * Math.PI) / 180
+  const φ2 = (lat2 * Math.PI) / 180
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180
+  const Δλ = ((lng2 - lng1) * Math.PI) / 180
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ/2) * Math.sin(Δλ/2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
   return R * c
 }
@@ -206,8 +237,6 @@ onMounted(async () => {
     console.log('TrackSelector: Auto-loaded saved PRTS track')
   }
 })
-
-
 
 async function handleTrackFile(event: Event) {
   const target = event.target as HTMLInputElement
@@ -299,7 +328,9 @@ function clearCustomTrack() {
   padding: 0;
   background: var(--color-surface);
   margin-top: 0;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .track-content {
@@ -378,7 +409,6 @@ function clearCustomTrack() {
     padding: 25px;
     margin: 20px;
   }
-
 }
 
 h3 {
@@ -427,7 +457,7 @@ h3 {
   accent-color: var(--color-primary);
 }
 
-.radio-option input[type='radio']:checked~.radio-label {
+.radio-option input[type='radio']:checked ~ .radio-label {
   font-weight: bold;
   color: var(--color-primary);
 }
@@ -442,7 +472,9 @@ h3 {
   font-size: 14px;
   color: var(--color-text);
   user-select: none;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .custom-track-options {
@@ -465,7 +497,9 @@ h3 {
   margin: 0;
   font-size: 14px;
   color: var(--color-text);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   white-space: nowrap;
 }
 
@@ -478,7 +512,9 @@ h3 {
   font-size: 13px;
   font-weight: bold;
   transition: all 0.2s;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -534,7 +570,6 @@ h3 {
   color: white !important;
 }
 
-
 .upload-label {
   display: flex;
   cursor: pointer;
@@ -560,7 +595,9 @@ h3 {
 .upload-placeholder p {
   margin: 0 0 4px 0;
   font-size: 12px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
@@ -569,7 +606,9 @@ h3 {
 .upload-placeholder small {
   font-size: 10px;
   color: var(--color-text-muted);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .track-loaded {
@@ -601,7 +640,9 @@ h3 {
   font-size: 12px;
   font-weight: bold;
   color: var(--color-success);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -609,7 +650,9 @@ h3 {
 .track-stats {
   font-size: 10px;
   color: var(--color-text-muted);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   margin: 0;
 }
 
@@ -648,7 +691,9 @@ h3 {
   font-weight: bold;
   margin-bottom: 8px;
   transition: all 0.2s;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -693,8 +738,6 @@ h3 {
   right: 0;
 }
 
-
-
 /* PRTS invitation styling */
 .prts-invitation {
   background: var(--color-surface);
@@ -710,7 +753,9 @@ h3 {
   margin: 0 0 15px 0;
   padding: 0 8px;
   font-weight: bold;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .action-buttons {
@@ -735,7 +780,9 @@ h3 {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 3px;
@@ -759,7 +806,9 @@ h3 {
   font-size: 12px;
   font-weight: bold;
   padding: 8px 12px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   align-self: center;
 }
@@ -786,7 +835,9 @@ h3 {
   padding: 8px 12px;
   font-size: 11px;
   color: var(--color-text-muted);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   word-break: break-all;

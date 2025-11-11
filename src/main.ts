@@ -22,9 +22,9 @@ app.use(Toast, {
   draggablePercent: 0.6,
   showCloseButtonOnHover: false,
   hideProgressBar: false,
-  closeButton: "button",
+  closeButton: 'button',
   icon: true,
-  rtl: false
+  rtl: false,
 })
 
 app.mount('#app')

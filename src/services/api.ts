@@ -22,8 +22,7 @@ function delay(ms: number): Promise<void> {
 
 function randomDelay(): Promise<void> {
   const delayMs =
-    (REQUEST_MIN_DELAY_SEC + Math.random() * (REQUEST_MAX_DELAY_SEC - REQUEST_MIN_DELAY_SEC)) *
-    1000
+    (REQUEST_MIN_DELAY_SEC + Math.random() * (REQUEST_MAX_DELAY_SEC - REQUEST_MIN_DELAY_SEC)) * 1000
   return delay(delayMs)
 }
 

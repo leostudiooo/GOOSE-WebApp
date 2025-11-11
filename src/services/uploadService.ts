@@ -1,6 +1,6 @@
 import { APIClient } from './api'
 import { VerificationService } from './verificationService'
-import type { Headers, User, Route, StartRecord, Track } from '@/types'
+import type { User, Route, Track } from '@/types'
 import { buildStartRecord, buildFinishRecord } from '@/utils/recordBuilder'
 import { RECORD_STATUS_FINISHED } from '@/types/constants'
 
@@ -33,7 +33,6 @@ export class UploadService {
     this.onProgress?.({ step, completed, error })
   }
 
-
   async uploadExerciseRecord(
     apiClient: APIClient,
     studentId: string,
@@ -41,12 +40,12 @@ export class UploadService {
     route: Route,
     track: Track,
     startImageFile: File,
-    finishImageFile: File
+    finishImageFile: File,
   ): Promise<UploadResult> {
     try {
       this.toastCallback?.('开始上传运动记录...', 'info')
       this.updateProgress('Starting upload', false)
-      
+
       this.toastCallback?.('正在上传图片...', 'info')
       this.updateProgress('Uploading start image', false)
       const startImageUrl = await apiClient.uploadStartImage(startImageFile)
@@ -57,16 +56,11 @@ export class UploadService {
       this.toastCallback?.('图片上传完成', 'success')
 
       this.updateProgress('Finish image uploaded', true)
-      
+
       this.toastCallback?.('正在创建运动记录...', 'info')
       this.updateProgress('Creating start record', false)
 
-      const startRecord = buildStartRecord(
-        route,
-        user.dateTime,
-        startImageUrl,
-        studentId
-      )
+      const startRecord = buildStartRecord(route, user.dateTime, startImageUrl, studentId)
 
       const recordId = await apiClient.uploadStartRecord(startRecord)
 
@@ -78,7 +72,7 @@ export class UploadService {
         finishImageUrl,
         track,
         recordId,
-        RECORD_STATUS_FINISHED
+        RECORD_STATUS_FINISHED,
       )
 
       await apiClient.uploadFinishRecord(finishRecord)
@@ -95,5 +89,4 @@ export class UploadService {
       return { success: false, error: errorMessage }
     }
   }
-
 }

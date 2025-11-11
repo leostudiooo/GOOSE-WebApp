@@ -68,7 +68,7 @@ export function maskEmail(email: string): string {
     return email
   }
   const [localPart, domain] = email.split('@')
-  if (localPart.length <= 2) {
+  if (!localPart || !domain || localPart.length <= 2) {
     return email
   }
   return localPart.slice(0, 2) + '***' + '@' + domain
@@ -78,7 +78,10 @@ export function maskEmail(email: string): string {
  * 格式化隐私化用户信息
  * 根据信息类型自动选择合适的隐私化方法
  */
-export function maskUserInfo(value: string, type: 'name' | 'account' | 'studentId' | 'phone' | 'email'): string {
+export function maskUserInfo(
+  value: string,
+  type: 'name' | 'account' | 'studentId' | 'phone' | 'email',
+): string {
   switch (type) {
     case 'name':
       return maskName(value)
@@ -119,7 +122,7 @@ export function getMaskedUserInfo(params: {
     maskedPhone?: string
     maskedEmail?: string
   } = {}
-  
+
   if (params.name) {
     result.maskedName = maskName(params.name)
   }
@@ -135,6 +138,6 @@ export function getMaskedUserInfo(params: {
   if (params.email) {
     result.maskedEmail = maskEmail(params.email)
   }
-  
+
   return result
 }

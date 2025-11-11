@@ -24,7 +24,14 @@
 
       <div class="toolbar-section actions">
         <button @click="clearPoints" class="btn btn-warning btn-compact">清除</button>
-        <button @click="exportAsJSON" class="btn btn-info btn-compact" :disabled="pathPoints.length === 0" title="导出为JSON文件">💾</button>
+        <button
+          @click="exportAsJSON"
+          class="btn btn-info btn-compact"
+          :disabled="pathPoints.length === 0"
+          title="导出为JSON文件"
+        >
+          💾
+        </button>
         <button @click="exportToGOOSE" class="btn btn-success btn-compact">完成绘制</button>
       </div>
     </div>
@@ -38,7 +45,6 @@
           @mouseleave="handleCanvasMouseLeave"
           class="map-canvas"
         ></canvas>
-
       </div>
 
       <div class="points-panel">
@@ -60,17 +66,10 @@
             <span class="point-coords">
               {{ point.lat.toFixed(6) }}, {{ point.lng.toFixed(6) }}
             </span>
-            <button
-              @click="removePoint(index)"
-              class="remove-btn"
-            >
-              ×
-            </button>
+            <button @click="removePoint(index)" class="remove-btn">×</button>
           </div>
 
-          <div v-if="pathPoints.length === 0" class="empty-state">
-            点击地图开始绘制轨迹
-          </div>
+          <div v-if="pathPoints.length === 0" class="empty-state">点击地图开始绘制轨迹</div>
         </div>
       </div>
     </div>
@@ -127,7 +126,7 @@ const mapBounds = ref({
   minLat: 31.8,
   maxLat: 32.1,
   minLng: 118.7,
-  maxLng: 119.0
+  maxLng: 119.0,
 })
 
 // Computed
@@ -171,13 +170,12 @@ const formattedTime = computed(() => {
 
 // Methods
 
-
 function calculateBounds() {
   if (!boundaryData.value?.paths.length) return
 
   const paths = boundaryData.value.paths
-  const lats = paths.map(p => p.lat)
-  const lngs = paths.map(p => p.lng)
+  const lats = paths.map((p) => p.lat)
+  const lngs = paths.map((p) => p.lng)
 
   const minLat = Math.min(...lats)
   const maxLat = Math.max(...lats)
@@ -198,7 +196,7 @@ function calculateBounds() {
 
   // Calculate lat/lng aspect ratio (approximate, considering latitude scaling)
   const latScale = 1
-  const lngScale = Math.cos(centerLat * Math.PI / 180) // longitude scaling at this latitude
+  const lngScale = Math.cos((centerLat * Math.PI) / 180) // longitude scaling at this latitude
   const dataAspectRatio = (lngRange * lngScale) / (latRange * latScale)
 
   // Adjust bounds to maintain aspect ratio
@@ -215,14 +213,14 @@ function calculateBounds() {
 
   // Add padding
   const paddingPercent = 0.15 // 15% padding
-  adjustedLatRange *= (1 + paddingPercent)
-  adjustedLngRange *= (1 + paddingPercent)
+  adjustedLatRange *= 1 + paddingPercent
+  adjustedLngRange *= 1 + paddingPercent
 
   mapBounds.value = {
     minLat: centerLat - adjustedLatRange / 2,
     maxLat: centerLat + adjustedLatRange / 2,
     minLng: centerLng - adjustedLngRange / 2,
-    maxLng: centerLng + adjustedLngRange / 2
+    maxLng: centerLng + adjustedLngRange / 2,
   }
 
   console.log('PRTS: Updated bounds to fit boundary with correct aspect ratio:', mapBounds.value)
@@ -254,8 +252,7 @@ function handleCanvasMouseMove(event: MouseEvent) {
 
   pathPoints.value.forEach((point, index) => {
     const distance = Math.sqrt(
-      Math.pow(latToY(point.lat) - y, 2) +
-      Math.pow(lngToX(point.lng) - x, 2)
+      Math.pow(latToY(point.lat) - y, 2) + Math.pow(lngToX(point.lng) - x, 2),
     )
     if (distance < 20 && distance < minDistance) {
       minDistance = distance
@@ -276,7 +273,7 @@ function addPathPoint(lat: number, lng: number) {
   const newPoint: PathPoint = {
     lat,
     lng,
-    sortNum: pathPoints.value.length + 1
+    sortNum: pathPoints.value.length + 1,
   }
   pathPoints.value.push(newPoint)
   drawMap()
@@ -304,10 +301,10 @@ function exportToGOOSE() {
     return
   }
 
-  const trackPoints: TrackPoint[] = sortedPathPoints.value.map(point => ({
+  const trackPoints: TrackPoint[] = sortedPathPoints.value.map((point) => ({
     lat: point.lat,
     lng: point.lng,
-    sortNum: point.sortNum
+    sortNum: point.sortNum,
   }))
 
   const metadata: TrackMetadata = {
@@ -317,12 +314,12 @@ function exportToGOOSE() {
     formattedTime: formattedTime.value,
     sampleTimeInterval: sampleTimeInterval.value,
     pointCount: pathPoints.value.length,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   }
 
   const track: Track = {
     track: trackPoints,
-    metadata
+    metadata,
   }
 
   // Auto-save to localStorage when completing
@@ -332,8 +329,8 @@ function exportToGOOSE() {
   const suggestions = {
     suggestedTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
     suggestedDuration: Math.ceil(totalTime.value / 60) + 5, // Add 5 minutes buffer
-    suggestedDistance: Math.round(totalDistance.value / 1000 * 100) / 100, // Round to 2 decimal places
-    optimalSampleInterval: sampleTimeInterval.value
+    suggestedDistance: Math.round((totalDistance.value / 1000) * 100) / 100, // Round to 2 decimal places
+    optimalSampleInterval: sampleTimeInterval.value,
   }
 
   emit('importTrack', track, suggestions)
@@ -346,7 +343,7 @@ function saveToLocalStorage() {
       pathPoints: pathPoints.value,
       sampleTimeInterval: sampleTimeInterval.value,
       savedAt: new Date().toISOString(),
-      routeName: props.routeName
+      routeName: props.routeName,
     }
     localStorage.setItem(PRTS_PATH_STORAGE_KEY, JSON.stringify(saveData))
     console.log('PRTS: Path points auto-saved to localStorage')
@@ -360,10 +357,10 @@ function loadExistingCustomTrack() {
   try {
     if (userStore.customTrackData && userStore.customTrackData.track.length > 0) {
       // Convert Track format to PathPoint format for editing
-      pathPoints.value = userStore.customTrackData.track.map(trackPoint => ({
+      pathPoints.value = userStore.customTrackData.track.map((trackPoint) => ({
         lat: trackPoint.lat,
         lng: trackPoint.lng,
-        sortNum: trackPoint.sortNum
+        sortNum: trackPoint.sortNum,
       }))
 
       // Load sample time interval if available
@@ -372,7 +369,11 @@ function loadExistingCustomTrack() {
       }
 
       drawMap()
-      console.log('PRTS: Loaded existing custom track for editing:', pathPoints.value.length, 'points')
+      console.log(
+        'PRTS: Loaded existing custom track for editing:',
+        pathPoints.value.length,
+        'points',
+      )
       return true
     }
   } catch (error) {
@@ -393,7 +394,11 @@ function loadFromLocalStorage() {
           sampleTimeInterval.value = saveData.sampleTimeInterval
         }
         drawMap()
-        console.log('PRTS: Path points loaded from localStorage:', saveData.pathPoints.length, 'points')
+        console.log(
+          'PRTS: Path points loaded from localStorage:',
+          saveData.pathPoints.length,
+          'points',
+        )
         return true
       }
     }
@@ -411,10 +416,10 @@ function exportAsJSON() {
   }
 
   try {
-    const trackPoints: TrackPoint[] = sortedPathPoints.value.map(point => ({
+    const trackPoints: TrackPoint[] = sortedPathPoints.value.map((point) => ({
       lat: point.lat,
       lng: point.lng,
-      sortNum: point.sortNum
+      sortNum: point.sortNum,
     }))
 
     const metadata: TrackMetadata = {
@@ -424,18 +429,18 @@ function exportAsJSON() {
       formattedTime: formattedTime.value,
       sampleTimeInterval: sampleTimeInterval.value,
       pointCount: pathPoints.value.length,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     }
 
     const track: Track = {
       track: trackPoints,
-      metadata
+      metadata,
     }
 
     const trackData = JSON.stringify(track, null, 2)
     const blob = new Blob([trackData], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    
+
     const link = document.createElement('a')
     link.href = url
     link.download = `prts-track-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`
@@ -443,7 +448,7 @@ function exportAsJSON() {
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-    
+
     alert('✅ 轨迹已导出为 JSON 文件')
   } catch (error) {
     console.error('Export error:', error)
@@ -481,15 +486,15 @@ function xToLng(x: number): number {
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   // Simplified distance calculation (Haversine formula)
   const R = 6371000 // Earth's radius in meters
-  const φ1 = lat1 * Math.PI / 180
-  const φ2 = lat2 * Math.PI / 180
-  const Δφ = (lat2 - lat1) * Math.PI / 180
-  const Δλ = (lng2 - lng1) * Math.PI / 180
+  const φ1 = (lat1 * Math.PI) / 180
+  const φ2 = (lat2 * Math.PI) / 180
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180
+  const Δλ = ((lng2 - lng1) * Math.PI) / 180
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ/2) * Math.sin(Δλ/2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
   return R * c
 }
@@ -626,39 +631,43 @@ onUnmounted(() => {
 })
 
 // Watch for route changes and update boundary accordingly
-watch(() => props.routeName, async (newRouteName) => {
-  console.log('PRTS: Route changed to:', newRouteName)
-  console.log('PRTS: Boundary loader available:', !!props.loadRouteBoundary)
-  console.log('PRTS: Current boundary data:', boundaryData.value)
+watch(
+  () => props.routeName,
+  async (newRouteName) => {
+    console.log('PRTS: Route changed to:', newRouteName)
+    console.log('PRTS: Boundary loader available:', !!props.loadRouteBoundary)
+    console.log('PRTS: Current boundary data:', boundaryData.value)
 
-  if (newRouteName && props.loadRouteBoundary && newRouteName !== '自定义轨迹') {
-    try {
-      console.log('PRTS: Loading boundary for route:', newRouteName)
-      const routeBoundary = await props.loadRouteBoundary(newRouteName)
-      console.log('PRTS: Loaded boundary:', routeBoundary)
+    if (newRouteName && props.loadRouteBoundary && newRouteName !== '自定义轨迹') {
+      try {
+        console.log('PRTS: Loading boundary for route:', newRouteName)
+        const routeBoundary = await props.loadRouteBoundary(newRouteName)
+        console.log('PRTS: Loaded boundary:', routeBoundary)
 
-      if (routeBoundary) {
-        boundaryData.value = routeBoundary
-        calculateBounds()
-        drawMap()
-        console.log('PRTS: Updated map with new boundary for route:', newRouteName)
-      } else {
-        console.warn('PRTS: No boundary data returned for route:', newRouteName)
+        if (routeBoundary) {
+          boundaryData.value = routeBoundary
+          calculateBounds()
+          drawMap()
+          console.log('PRTS: Updated map with new boundary for route:', newRouteName)
+        } else {
+          console.warn('PRTS: No boundary data returned for route:', newRouteName)
+        }
+      } catch (error) {
+        console.error('PRTS: Failed to update boundary for route:', newRouteName, error)
+        // Fallback to default boundary
+        if (props.defaultBoundary) {
+          boundaryData.value = props.defaultBoundary
+          calculateBounds()
+          drawMap()
+          console.log('PRTS: Fallen back to default boundary')
+        }
       }
-    } catch (error) {
-      console.error('PRTS: Failed to update boundary for route:', newRouteName, error)
-      // Fallback to default boundary
-      if (props.defaultBoundary) {
-        boundaryData.value = props.defaultBoundary
-        calculateBounds()
-        drawMap()
-        console.log('PRTS: Fallen back to default boundary')
-      }
+    } else {
+      console.log('PRTS: Skipping boundary update - route is custom or no boundary loader')
     }
-  } else {
-    console.log('PRTS: Skipping boundary update - route is custom or no boundary loader')
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+)
 
 function resizeCanvas() {
   if (!mapCanvas.value) return
@@ -698,7 +707,9 @@ function resizeCanvas() {
   background: transparent;
   border: none;
   overflow: hidden;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .prts-header {
@@ -717,7 +728,9 @@ function resizeCanvas() {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .close-btn {
@@ -727,7 +740,9 @@ function resizeCanvas() {
   font-size: 12px;
   cursor: pointer;
   padding: 4px 8px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   transition: all 0.2s;
@@ -767,9 +782,10 @@ function resizeCanvas() {
   color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
-
 
 .time-input {
   width: 60px;
@@ -777,7 +793,9 @@ function resizeCanvas() {
   border: 1px solid var(--color-border-subtle);
   background: var(--color-surface-interactive);
   color: var(--color-text);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 11px;
   font-weight: bold;
   outline: none;
@@ -803,7 +821,6 @@ function resizeCanvas() {
   border-color: var(--color-primary);
 }
 
-
 .stat {
   background: var(--color-surface);
   padding: 6px 12px;
@@ -811,7 +828,9 @@ function resizeCanvas() {
   font-size: 11px;
   font-weight: bold;
   color: var(--color-text);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   height: 28px;
   display: inline-flex;
@@ -832,7 +851,9 @@ function resizeCanvas() {
   font-size: 11px;
   font-weight: bold;
   transition: all 0.2s;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -903,7 +924,6 @@ function resizeCanvas() {
   cursor: crosshair;
 }
 
-
 .points-panel {
   width: 280px;
   background: var(--color-surface);
@@ -931,7 +951,9 @@ function resizeCanvas() {
   margin: 0;
   color: var(--color-text);
   font-size: 16px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -941,7 +963,9 @@ function resizeCanvas() {
   margin-top: 4px;
   font-size: 10px;
   color: var(--color-success);
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
@@ -962,7 +986,9 @@ function resizeCanvas() {
   background: var(--color-surface-interactive);
   border: 1px solid var(--color-border-subtle);
   transition: all 0.3s;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .point-item.active {
@@ -981,12 +1007,16 @@ function resizeCanvas() {
   justify-content: center;
   font-size: 12px;
   font-weight: bold;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .point-coords {
   flex: 1;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 12px;
   color: var(--color-text);
 }
@@ -1004,7 +1034,9 @@ function resizeCanvas() {
   font-size: 14px;
   line-height: 1;
   transition: background-color 0.3s;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
 }
 
@@ -1016,7 +1048,9 @@ function resizeCanvas() {
   text-align: center;
   color: var(--color-text-muted);
   padding: 40px 20px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 13px;
 }
 

@@ -18,10 +18,6 @@ import { useUserStore } from '@/stores/user'
 import ImageUploader from './ImageUploader.vue'
 
 const userStore = useUserStore()
-
-
-
-
 </script>
 
 <style scoped>

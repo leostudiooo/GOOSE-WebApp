@@ -22,13 +22,13 @@
   --tui-accent-bg: rgba(102, 51, 204, 0.05);
   --tui-drag-bg: rgba(0, 102, 204, 0.1);
   --tui-drag-shadow: rgba(0, 102, 204, 0.3);
-  
+
   /* Retro 3D shadows */
   --shadow-inset: inset 1px 1px 0 rgba(255, 255, 255, 0.8), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
   --shadow-raised: 1px 1px 0 rgba(255, 255, 255, 0.8), 2px 2px 0 rgba(0, 0, 0, 0.1);
   --shadow-pressed: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-window: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
-  
+
   /* Common colors */
   --color-background: var(--tui-bg);
   --color-surface: var(--tui-surface);
@@ -44,10 +44,12 @@
   --color-success-bg: var(--tui-success-bg);
   --color-danger: var(--tui-danger);
   --color-danger-bg: var(--tui-danger-bg);
+  --color-warning: var(--tui-warning);
+  --color-warning-bg: var(--tui-warning-bg);
 }
 
 /* Dark theme */
-[data-theme="dark"] {
+[data-theme='dark'] {
   --tui-bg: #1a1a1a;
   --tui-surface: #2a2a2a;
   --tui-surface-raised: #333333;
@@ -69,7 +71,7 @@
   --tui-accent-bg: rgba(153, 102, 255, 0.1);
   --tui-drag-bg: rgba(51, 153, 255, 0.1);
   --tui-drag-shadow: rgba(51, 153, 255, 0.4);
-  
+
   /* Dark theme shadows */
   --shadow-inset: inset 1px 1px 0 rgba(255, 255, 255, 0.1), inset -1px -1px 0 rgba(0, 0, 0, 0.4);
   --shadow-raised: 1px 1px 0 rgba(255, 255, 255, 0.1), 2px 2px 0 rgba(0, 0, 0, 0.3);
@@ -78,7 +80,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme='light']) {
     --tui-bg: #1a1a1a;
     --tui-surface: #2a2a2a;
     --tui-surface-raised: #333333;
@@ -100,7 +102,7 @@
     --tui-accent-bg: rgba(153, 102, 255, 0.1);
     --tui-drag-bg: rgba(51, 153, 255, 0.1);
     --tui-drag-shadow: rgba(51, 153, 255, 0.4);
-    
+
     /* Dark theme shadows */
     --shadow-inset: inset 1px 1px 0 rgba(255, 255, 255, 0.1), inset -1px -1px 0 rgba(0, 0, 0, 0.4);
     --shadow-raised: 1px 1px 0 rgba(255, 255, 255, 0.1), 2px 2px 0 rgba(0, 0, 0, 0.3);
@@ -126,19 +128,8 @@ body {
     background-color 0.2s;
   line-height: 1.5;
   font-family:
-    'JetBrains Mono',
-    'Fira Code',
-    'Source Code Pro',
-    'SF Mono',
-    Monaco,
-    'Cascadia Code',
-    'Roboto Mono',
-    Consolas,
-    'Liberation Mono',
-    Menlo,
-    Courier,
-    monospace,
-    sans-serif;
+    'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 14px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
