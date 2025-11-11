@@ -1,7 +1,6 @@
 <template>
   <div class="home-view">
-    <div class="content-wrapper">
-      <div class="app-window">
+    <div class="app-window">
         <div class="titlebar">
           <div class="titlebar-center">
             <span class="logo-emoji">🪿</span>
@@ -39,25 +38,24 @@
 
         <!-- Upload controls at bottom of window -->
         <div class="upload-controls">
-          <button @click="handleValidation" class="upload-btn validation-btn" :disabled="!canValidate">
-            验证配置
+          <button @click="handleValidation" class="upload-btn validation-btn" :disabled="!canValidate || isValidating">
+            {{ isValidating ? '验证中...' : '验证配置' }}
           </button>
-          <button @click="handleUpload" class="upload-btn upload-btn-main" :disabled="!canUpload">
-            上传记录
+          <button @click="handleUpload" class="upload-btn upload-btn-main" :disabled="!canUpload || isUploading">
+            {{ isUploading ? '上传中...' : '上传记录' }}
           </button>
         </div>
       </div>
 
-      <footer class="footer">
-        <p>
-          基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a> 项目开发
-          | GPL-3.0 License
-        </p>
-        <p class="warning">
-          ⚠️ 本软件按"原样"提供，不附带任何担保。用户应对其上传的数据承担全部责任。
-        </p>
-      </footer>
-    </div>
+    <footer class="footer">
+      <p>
+        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a> 项目开发
+        | GPL-3.0 License
+      </p>
+      <p class="warning">
+        ⚠️ 本软件按"原样"提供，不附带任何担保。用户应对其上传的数据承担全部责任。
+      </p>
+    </footer>
   </div>
 </template>
 
@@ -70,13 +68,21 @@ import UserConfigForm from '@/components/UserConfigForm.vue'
 import TrackSelector from '@/components/TrackSelector.vue'
 import PRTSTracker from '@/components/PRTSTracker.vue'
 import { loadRouteBoundary } from '@/utils/boundaryLoader'
-import type { Track } from '@/types'
+import { VerificationService } from '@/services/verificationService'
+import { UploadService, type UploadProgress } from '@/services/uploadService'
+import { useToast } from 'vue-toastification'
+import type { Track, TrackPoint } from '@/types'
 
 const configStore = useConfigStore()
 const userStore = useUserStore()
 const routeStore = useRouteStore()
+const toast = useToast()
 const showPRTSTracker = ref(false)
 const theme = ref<'light' | 'dark' | 'auto'>('auto')
+const isValidating = ref(false)
+const isUploading = ref(false)
+const uploadProgress = ref<UploadProgress | null>(null)
+const validationResult = ref<string>('')
 
 const isDark = computed(() => {
   if (theme.value === 'auto') {
@@ -130,37 +136,100 @@ const canUpload = computed(() => {
 })
 
 // Handle validation
-function handleValidation() {
-  if (!canValidate.value) return
+async function handleValidation() {
+  if (!canValidate.value || isValidating.value) return
 
-  // Simple validation feedback
-  const missing = []
-  if (!userStore.user.token) missing.push('Token')
-  if (!userStore.user.route) missing.push('运动场地')
+  isValidating.value = true
+  validationResult.value = ''
 
-  if (missing.length > 0) {
-    alert(`❌ 配置不完整，缺少: ${missing.join(', ')}`)
-  } else {
-    alert('✅ 配置验证通过！')
+  try {
+    if (!configStore.headers) {
+      throw new Error('配置未加载')
+    }
+
+    const verificationService = new VerificationService()
+
+    const result = await verificationService.validateUserConfig(
+      userStore.user,
+      configStore.headers
+    )
+
+    if (result.isValid) {
+      let successMessage = '配置验证通过！用户信息：'
+      if (result.name) {
+        successMessage += `\n${result.name}`
+      }
+      if (result.account) {
+        successMessage += `\n${result.account}`
+      }
+      if (result.studentId) {
+        successMessage += `\n${result.studentId}`
+      }
+      validationResult.value = successMessage
+      toast.success(successMessage)
+    } else {
+      validationResult.value = `验证失败: ${result.error}`
+      toast.error(validationResult.value)
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '验证过程中发生错误'
+    validationResult.value = `验证失败: ${errorMessage}`
+    toast.error(validationResult.value)
+  } finally {
+    isValidating.value = false
   }
 }
 
 // Handle upload
-function handleUpload() {
-  if (!canUpload.value) return
+async function handleUpload() {
+  if (!canUpload.value || isUploading.value) return
 
-  // Check what's missing for upload
-  const missing = []
-  if (!userStore.user.token) missing.push('Token')
-  if (!userStore.startImageFile) missing.push('开始图片')
-  if (!userStore.finishImageFile) missing.push('结束图片')
-  if (!userStore.user.route) missing.push('运动场地')
+  isUploading.value = true
+  uploadProgress.value = null
 
-  if (missing.length > 0) {
-    alert(`❌ 无法上传，缺少: ${missing.join(', ')}`)
-  } else {
-    // TODO: Implement actual upload logic
-    alert('🚀 开始上传记录...\n\n(上传功能尚未实现)')
+  try {
+    const uploadService = new UploadService((progress) => {
+      uploadProgress.value = progress
+    })
+
+    // Get the selected route
+    const selectedRoute = routeStore.routes.find(r => r.routeName === userStore.user.route)
+    if (!selectedRoute) {
+      throw new Error('未找到选定的运动场地')
+    }
+
+    if (!configStore.headers) {
+      throw new Error('配置未加载')
+    }
+
+    // Get track data
+    let trackData: TrackPoint[] = []
+    if (userStore.user.customTrack.enable && userStore.customTrackData) {
+      trackData = userStore.customTrackData.track
+    } else {
+      // Load default track for the route
+      // This would need to be implemented based on your track loading logic
+      trackData = [] // Placeholder
+    }
+
+    const result = await uploadService.uploadExerciseRecord(
+      userStore.user,
+      configStore.headers,
+      selectedRoute,
+      trackData
+    )
+
+    if (result.success) {
+      toast.success(`上传成功！记录ID: ${result.recordId}`)
+    } else {
+      toast.error(`上传失败: ${result.error}`)
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '上传过程中发生错误'
+    toast.error(`上传失败: ${errorMessage}`)
+  } finally {
+    isUploading.value = false
+    uploadProgress.value = null
   }
 }
 
@@ -182,19 +251,14 @@ onMounted(async () => {
 })
 
 // Handle PRTS events
-function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) {
+function handleImportTrack(track: Track) {
   // Enable custom track
   userStore.enableCustomTrack(track)
 
   // Show success message
-  let message = `✅ 自定义轨迹绘制完成！\n📍 共 ${track.track.length} 个点\n📏 距离: ${track.metadata.formattedDistance}\n⏱️ 预计时间: ${track.metadata.formattedTime}`
+  const message = `自定义轨迹绘制完成！\n采样：${track.track.length} 个点\n距离：${track.metadata.formattedDistance}\n时间：${track.metadata.formattedTime}`
 
-  if (suggestions && suggestions.suggestedTime) {
-    const suggestedTime = new Date(String(suggestions.suggestedTime))
-    message += `\n💡 建议: 设置锻炼时间为 ${suggestedTime.toLocaleString()}`
-  }
-
-  alert(message)
+  toast.success(message)
 
   // Hide PRTS tracker
   showPRTSTracker.value = false
@@ -204,20 +268,15 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
 
 <style scoped>
 .home-view {
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   background: var(--color-background);
   color: var(--color-text);
   box-sizing: border-box;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.content-wrapper {
-  min-height: 100vh;
-  box-sizing: border-box;
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .app-window {
@@ -229,6 +288,8 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
   display: flex;
   flex-direction: column;
   transition: all 0.4s ease;
+  min-height: 0;
+  max-height: 100%;
 }
 
 .titlebar {
@@ -294,6 +355,8 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
   box-sizing: border-box;
   flex: 1;
   background: var(--color-background);
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .content-columns {
@@ -335,7 +398,7 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
   max-width: 2000px;
   font-family: 'Courier New', monospace;
   padding: 20px;
-  padding-bottom: 0;
+  flex-shrink: 0;
 }
 
 .footer p {
@@ -358,8 +421,8 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
 }
 
 @media (min-width: 768px) {
-  .content-wrapper {
-    padding: 30px 15px;
+  .home-view {
+    padding: 30px;
   }
 
   .logo {
@@ -398,7 +461,7 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
 }
 
 @media (min-width: 1024px) {
-  .content-wrapper {
+  .home-view {
     padding: 20px;
   }
 
@@ -438,7 +501,7 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
 }
 
 @media (min-width: 1280px) {
-  .content-wrapper {
+  .home-view {
     padding: 40px 30px;
   }
 
@@ -466,12 +529,8 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
 }
 
 @media (min-width: 2000px) {
-  .content-wrapper {
+  .home-view {
     padding: 40px 50px;
-  }
-
-  .main-content {
-    padding: 0 30px;
   }
 
   .content-columns {
@@ -564,6 +623,101 @@ function handleImportTrack(track: Track, suggestions?: Record<string, unknown>) 
   color: var(--color-background);
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* Custom scrollbar styles - Main window content */
+.window-content::-webkit-scrollbar {
+  width: 16px;
+  background: var(--color-surface);
+}
+
+.window-content::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.window-content::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  min-height: 30px;
+  background-clip: padding-box;
+}
+
+.window-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.window-content::-webkit-scrollbar-thumb:active {
+  background: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+.window-content::-webkit-scrollbar-corner {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Custom scrollbar for other scrollable elements */
+.prts-wrapper::-webkit-scrollbar,
+.config-column > *::-webkit-scrollbar,
+.upload-column > *::-webkit-scrollbar {
+  width: 12px;
+  background: var(--color-surface);
+}
+
+.prts-wrapper::-webkit-scrollbar-track,
+.config-column > *::-webkit-scrollbar-track,
+.upload-column > *::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.prts-wrapper::-webkit-scrollbar-thumb,
+.config-column > *::-webkit-scrollbar-thumb,
+.upload-column > *::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  min-height: 24px;
+  background-clip: padding-box;
+}
+
+.prts-wrapper::-webkit-scrollbar-thumb:hover,
+.config-column > *::-webkit-scrollbar-thumb:hover,
+.upload-column > *::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.prts-wrapper::-webkit-scrollbar-thumb:active,
+.config-column > *::-webkit-scrollbar-thumb:active,
+.upload-column > *::-webkit-scrollbar-thumb:active {
+  background: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+.prts-wrapper::-webkit-scrollbar-corner,
+.config-column > *::-webkit-scrollbar-corner,
+.upload-column > *::-webkit-scrollbar-corner {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Firefox scrollbar */
+.window-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-muted) var(--color-surface);
+}
+
+.prts-wrapper,
+.config-column > *,
+.upload-column > * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-muted) var(--color-surface);
 }
 
 </style>
