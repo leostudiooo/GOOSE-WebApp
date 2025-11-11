@@ -71,7 +71,7 @@ import { loadRouteBoundary } from '@/utils/boundaryLoader'
 import { VerificationService } from '@/services/verificationService'
 import { UploadService, type UploadProgress } from '@/services/uploadService'
 import { useToast } from 'vue-toastification'
-import type { Track, TrackPoint } from '@/types'
+import type { Track } from '@/types'
 import { getMaskedUserInfo } from '@/utils/privacyHelper'
 
 const configStore = useConfigStore()
@@ -84,6 +84,17 @@ const isValidating = ref(false)
 const isUploading = ref(false)
 const uploadProgress = ref<UploadProgress | null>(null)
 const validationResult = ref<string>('')
+const isTokenValidated = ref(false) // 跟踪 token 是否已成功验证
+const validatedApiClient = ref<any>(null) // 存储已验证的 API client
+const validatedStudentId = ref<string>('') // 存储已验证的学生ID
+
+// 监听 token 变化，重置验证状态
+watch(() => userStore.user.token, () => {
+  isTokenValidated.value = false
+  validationResult.value = ''
+  validatedApiClient.value = null
+  validatedStudentId.value = ''
+})
 
 const isDark = computed(() => {
   if (theme.value === 'auto') {
@@ -124,16 +135,26 @@ function handleClosePRTS() {
 
 // Computed properties for button states
 const canValidate = computed(() => {
-  return userStore.user.token && userStore.user.route
+  // 验证配置只需要 token
+  return !!userStore.user.token
 })
 
 const canUpload = computed(() => {
-  return (
+  // 上传需要所有字段完整
+  const hasBasicFields = (
     userStore.user.token &&
     userStore.startImageFile &&
     userStore.finishImageFile &&
     userStore.user.route
   )
+  
+  // 如果启用了自定义轨迹，还需要有轨迹数据
+  const hasTrackData = userStore.user.customTrack.enable ? 
+    !!userStore.customTrackData : 
+    true // 默认轨迹不需要额外检查
+  
+  // 必须已经成功验证过 token
+  return hasBasicFields && hasTrackData && isTokenValidated.value
 })
 
 // Handle validation
@@ -148,14 +169,24 @@ async function handleValidation() {
       throw new Error('配置未加载')
     }
 
-    const verificationService = new VerificationService()
+    const verificationService = new VerificationService((message, type) => {
+      if (type === 'info') toast.info(message)
+      else if (type === 'success') toast.success(message)
+      else if (type === 'error') toast.error(message)
+    })
 
-    const result = await verificationService.validateUserConfig(
+    const result = await verificationService.validateTokenOnly(
       userStore.user,
       configStore.headers
     )
 
     if (result.isValid) {
+      isTokenValidated.value = true // 标记为已验证
+      
+      // 保存验证结果，供上传时复用
+      validatedApiClient.value = verificationService.getApiClient()
+      validatedStudentId.value = result.studentId || ''
+      
       let successMessage = '配置验证通过！用户信息：'
       // 使用 masked data 显示敏感信息
       const maskedInfo = getMaskedUserInfo({
@@ -173,8 +204,9 @@ async function handleValidation() {
         successMessage += `\n${maskedInfo.maskedStudentId}`
       }
       validationResult.value = successMessage
-      toast.success(successMessage)
+      // 验证成功时不再单独显示 toast，因为已经在验证过程中显示了
     } else {
+      isTokenValidated.value = false // 验证失败时重置状态
       validationResult.value = `验证失败: ${result.error}`
       toast.error(validationResult.value)
     }
@@ -191,13 +223,58 @@ async function handleValidation() {
 async function handleUpload() {
   if (!canUpload.value || isUploading.value) return
 
+  // 检查 token 是否已验证
+  if (!isTokenValidated.value) {
+    toast.error('请先验证配置')
+    return
+  }
+
+  // 上传前再次检查所有必需字段
+  if (!userStore.user.token) {
+    toast.error('请先填写 Token')
+    return
+  }
+  
+  if (!userStore.user.route) {
+    toast.error('请选择运动场馆')
+    return
+  }
+  
+  if (!userStore.startImageFile) {
+    toast.error('请上传开始图片')
+    return
+  }
+  
+  if (!userStore.finishImageFile) {
+    toast.error('请上传结束图片')
+    return
+  }
+  
+  // 检查是否有轨迹数据
+  if (userStore.user.customTrack.enable && !userStore.customTrackData) {
+    toast.error('请上传轨迹文件或绘制自定义轨迹')
+    return
+  }
+
   isUploading.value = true
   uploadProgress.value = null
 
   try {
-    const uploadService = new UploadService((progress) => {
-      uploadProgress.value = progress
-    })
+    // 检查是否有缓存的验证信息
+    if (!validatedApiClient.value) {
+      throw new Error('API client 未初始化')
+    }
+
+    const uploadService = new UploadService(
+      (progress) => {
+        uploadProgress.value = progress
+      },
+      (message, type) => {
+        if (type === 'info') toast.info(message)
+        else if (type === 'success') toast.success(message)  
+        else if (type === 'error') toast.error(message)
+      }
+    )
 
     // Get the selected route
     const selectedRoute = routeStore.routes.find(r => r.routeName === userStore.user.route)
@@ -205,23 +282,20 @@ async function handleUpload() {
       throw new Error('未找到选定的运动场地')
     }
 
-    if (!configStore.headers) {
-      throw new Error('配置未加载')
-    }
-
     // Get track data
-    let trackData: TrackPoint[] = []
+    let trackData: Track
     if (userStore.user.customTrack.enable && userStore.customTrackData) {
-      trackData = userStore.customTrackData.track
+      trackData = userStore.customTrackData
     } else {
       // Load default track for the route
       // This would need to be implemented based on your track loading logic
-      trackData = [] // Placeholder
+      throw new Error('暂不支持默认轨迹，请使用自定义轨迹')
     }
 
     const result = await uploadService.uploadExerciseRecord(
+      validatedApiClient.value,
+      validatedStudentId.value,
       userStore.user,
-      configStore.headers,
       selectedRoute,
       trackData,
       userStore.startImageFile!,

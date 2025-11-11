@@ -71,23 +71,23 @@ export interface StartRecord {
   startTime: string
   startImage: string
   endTime: string
-  exerciseTimes: string
+  exerciseTimes: string | number
   routeKilometre: string
   endImage: string
-  strLatitudeLongitude: TrackPoint[]
+  strLatitudeLongitude: string
   routeRule: string
   maxTime: number
   minTime: number
   orouteKilometre: number
   ruleEndTime: string
   ruleStartTime: string
-  calorie: number
+  calorie: string
   speed: string
-  dispTimeText: number
+  dispTimeText: string
   studentId: string
 }
 
 export interface FinishRecord extends StartRecord {
   id: string
-  nowStatus: number
+  nowStatus: string
 }

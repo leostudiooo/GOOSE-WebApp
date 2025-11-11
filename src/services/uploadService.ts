@@ -1,8 +1,10 @@
 import { APIClient } from './api'
 import { VerificationService } from './verificationService'
-import type { Headers, User, Route, StartRecord, TrackPoint } from '@/types'
+import type { Headers, User, Route, StartRecord, Track } from '@/types'
 import { buildStartRecord, buildFinishRecord } from '@/utils/recordBuilder'
 import { RECORD_STATUS_FINISHED } from '@/types/constants'
+
+type ToastCallback = (message: string, type: 'info' | 'success' | 'error') => void
 
 export interface UploadProgress {
   step: string
@@ -19,10 +21,12 @@ export interface UploadResult {
 export class UploadService {
   private verificationService: VerificationService
   private onProgress?: (progress: UploadProgress) => void
+  private toastCallback?: ToastCallback
 
-  constructor(onProgress?: (progress: UploadProgress) => void) {
-    this.verificationService = new VerificationService()
+  constructor(onProgress?: (progress: UploadProgress) => void, toastCallback?: ToastCallback) {
+    this.verificationService = new VerificationService(toastCallback)
     this.onProgress = onProgress
+    this.toastCallback = toastCallback
   }
 
   private updateProgress(step: string, completed: boolean, error?: string) {
@@ -31,47 +35,37 @@ export class UploadService {
 
 
   async uploadExerciseRecord(
+    apiClient: APIClient,
+    studentId: string,
     user: User,
-    headers: Headers,
     route: Route,
-    track: TrackPoint[],
+    track: Track,
     startImageFile: File,
     finishImageFile: File
   ): Promise<UploadResult> {
     try {
-      this.updateProgress('Validating configuration', false)
+      this.toastCallback?.('开始上传运动记录...', 'info')
+      this.updateProgress('Starting upload', false)
       
-      const validationResult = await this.verificationService.validateUserConfig(user, headers)
-      if (!validationResult.isValid) {
-        this.updateProgress('Validation failed', false, validationResult.error)
-        return { success: false, error: validationResult.error }
-      }
-
-      const apiClient = this.verificationService.getApiClient()
-      if (!apiClient) {
-        throw new Error('API client not initialized')
-      }
-
-      this.updateProgress('Validation completed', true)
+      this.toastCallback?.('正在上传图片...', 'info')
       this.updateProgress('Uploading start image', false)
-
       const startImageUrl = await apiClient.uploadStartImage(startImageFile)
 
       this.updateProgress('Start image uploaded', true)
       this.updateProgress('Uploading finish image', false)
-
       const finishImageUrl = await apiClient.uploadFinishImage(finishImageFile)
+      this.toastCallback?.('图片上传完成', 'success')
 
       this.updateProgress('Finish image uploaded', true)
+      
+      this.toastCallback?.('正在创建运动记录...', 'info')
       this.updateProgress('Creating start record', false)
 
       const startRecord = buildStartRecord(
         route,
         user.dateTime,
         startImageUrl,
-        finishImageUrl,
-        track,
-        validationResult.studentId!
+        studentId
       )
 
       const recordId = await apiClient.uploadStartRecord(startRecord)
@@ -81,11 +75,14 @@ export class UploadService {
 
       const finishRecord = buildFinishRecord(
         startRecord,
+        finishImageUrl,
+        track,
         recordId,
         RECORD_STATUS_FINISHED
       )
 
       await apiClient.uploadFinishRecord(finishRecord)
+      this.toastCallback?.('运动记录提交完成！', 'success')
 
       this.updateProgress('Finish record uploaded', true)
       this.updateProgress('Upload completed successfully', true)
@@ -93,51 +90,10 @@ export class UploadService {
       return { success: true, recordId }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Upload failed'
+      this.toastCallback?.(errorMessage, 'error')
       this.updateProgress('Upload failed', false, errorMessage)
       return { success: false, error: errorMessage }
     }
   }
 
-  async uploadImages(
-    startImageFile: File,
-    finishImageFile: File,
-    apiClient: APIClient
-  ): Promise<{ startImageUrl: string; finishImageUrl: string }> {
-    this.updateProgress('Uploading start image', false)
-    
-    const startImageUrl = await apiClient.uploadStartImage(startImageFile)
-    
-    this.updateProgress('Start image uploaded', true)
-    this.updateProgress('Uploading finish image', false)
-    
-    const finishImageUrl = await apiClient.uploadFinishImage(finishImageFile)
-    
-    this.updateProgress('Finish image uploaded', true)
-    
-    return { startImageUrl, finishImageUrl }
-  }
-
-  async uploadRecords(
-    startRecord: StartRecord,
-    apiClient: APIClient
-  ): Promise<string> {
-    this.updateProgress('Creating start record', false)
-    
-    const recordId = await apiClient.uploadStartRecord(startRecord)
-    
-    this.updateProgress('Start record created', true)
-    this.updateProgress('Creating finish record', false)
-    
-    const finishRecord = buildFinishRecord(
-      startRecord,
-      recordId,
-      RECORD_STATUS_FINISHED
-    )
-    
-    await apiClient.uploadFinishRecord(finishRecord)
-    
-    this.updateProgress('Finish record uploaded', true)
-    
-    return recordId
-  }
 }
