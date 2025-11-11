@@ -27,16 +27,16 @@
 
       <!-- Upload Section -->
       <div class="upload-section">
-        <div class="upload-area" 
+        <div class="upload-area"
              @drop.prevent="handleDrop"
              @dragover.prevent="handleDragOver"
              @dragenter.prevent="handleDragEnter"
              @dragleave.prevent="handleDragLeave"
              :class="{ 'drag-over': isDragOver }">
-          
+
           <input id="track-file" type="file" accept="application/json,.json" @change="handleTrackFile"
             class="file-input" />
-          
+
           <!-- Show upload interface when no track loaded -->
           <label v-if="!userStore.customTrackData" for="track-file" class="upload-label">
             <div class="upload-placeholder">
@@ -49,7 +49,7 @@
           <!-- Show track info when track is loaded -->
           <div v-else class="track-loaded">
             <div class="track-info-display">
-              <span class="track-icon">✅</span>
+              <span class="track-icon">🏟️</span>
               <div class="track-details">
                 <p class="track-name">{{ trackFileName || '已加载轨迹' }}</p>
                 <small class="track-stats">
@@ -78,6 +78,7 @@ const userStore = useUserStore()
 const trackFileName = ref<string>('')
 const isLoadingBoundary = ref(false)
 const isDragOver = ref<boolean>(false)
+let dragCounter = 0
 
 // localStorage key for auto-loading PRTS tracks (same as PRTSTracker)
 const PRTS_PATH_STORAGE_KEY = 'goose_prts_path_points'
@@ -193,6 +194,12 @@ function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
 onMounted(async () => {
   console.log('TrackSelector: Component mounted')
 
+  // Ensure custom track mode is enabled by default
+  if (!userStore.user.customTrack.enable) {
+    console.log('TrackSelector: Enabling custom track mode by default')
+    userStore.user.customTrack.enable = true
+  }
+
   // Try to auto-load PRTS track from localStorage
   const loaded = loadPRTSTrackFromStorage()
   if (loaded) {
@@ -232,27 +239,42 @@ async function processTrackFile(file: File) {
   }
 }
 
+// 防止默认行为的通用函数
+function preventDefaults(event: DragEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
 // Drag and drop handlers
 function handleDrop(event: DragEvent) {
+  preventDefaults(event)
+  dragCounter = 0
   isDragOver.value = false
+
   const files = event.dataTransfer?.files
-  if (files && files[0]) {
+  if (files && files[0] && files[0].name.endsWith('.json')) {
     processTrackFile(files[0])
   }
 }
 
 function handleDragOver(event: DragEvent) {
-  event.preventDefault()
+  preventDefaults(event)
 }
 
 function handleDragEnter(event: DragEvent) {
-  event.preventDefault()
-  isDragOver.value = true
+  preventDefaults(event)
+  dragCounter++
+  if (dragCounter === 1) {
+    isDragOver.value = true
+  }
 }
 
 function handleDragLeave(event: DragEvent) {
-  event.preventDefault()
-  isDragOver.value = false
+  preventDefaults(event)
+  dragCounter--
+  if (dragCounter === 0) {
+    isDragOver.value = false
+  }
 }
 
 // Clear custom track and localStorage
@@ -260,7 +282,7 @@ function clearCustomTrack() {
   if (confirm('确定要清除当前自定义轨迹吗？这也会清除本地存储的轨迹数据。')) {
     userStore.disableCustomTrack()
     trackFileName.value = ''
-    
+
     // Also clear localStorage
     try {
       localStorage.removeItem(PRTS_PATH_STORAGE_KEY)
@@ -485,19 +507,38 @@ h3 {
   position: relative;
   border: 2px dashed var(--color-border);
   background: var(--color-background);
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   min-height: 100px;
+  border-radius: 6px;
+  margin: 15px 0;
 }
 
 .upload-area:hover {
   border-color: var(--color-primary);
   background: var(--color-surface);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px var(--tui-drag-bg);
 }
 
 .upload-area.drag-over {
-  border-color: var(--color-primary);
-  background: var(--color-surface);
+  border-color: var(--tui-primary);
+  border-style: solid;
+  background: var(--tui-primary);
+  color: white;
 }
+
+.upload-area.drag-over .upload-label,
+.upload-area.drag-over .upload-help,
+.upload-area.drag-over .upload-placeholder,
+.upload-area.drag-over .upload-placeholder p,
+.upload-area.drag-over .upload-placeholder small,
+.upload-area.drag-over .track-loaded,
+.upload-area.drag-over .track-info-display,
+.upload-area.drag-over .track-name,
+.upload-area.drag-over .track-points {
+  color: white !important;
+}
+
 
 .upload-label {
   display: flex;

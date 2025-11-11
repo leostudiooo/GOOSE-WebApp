@@ -45,6 +45,7 @@ const emit = defineEmits<{
 const imageUrl = ref<string>('')
 const fileName = ref<string>('')
 const isDragOver = ref<boolean>(false)
+let dragCounter = 0
 
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement
@@ -63,26 +64,41 @@ function processFile(file: File) {
   }
 }
 
+// 防止默认行为的通用函数
+function preventDefaults(event: DragEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
 function handleDrop(event: DragEvent) {
+  preventDefaults(event)
+  dragCounter = 0
   isDragOver.value = false
+  
   const files = event.dataTransfer?.files
-  if (files && files[0]) {
+  if (files && files[0] && files[0].type.startsWith('image/')) {
     processFile(files[0])
   }
 }
 
 function handleDragOver(event: DragEvent) {
-  event.preventDefault()
+  preventDefaults(event)
 }
 
 function handleDragEnter(event: DragEvent) {
-  event.preventDefault()
-  isDragOver.value = true
+  preventDefaults(event)
+  dragCounter++
+  if (dragCounter === 1) {
+    isDragOver.value = true
+  }
 }
 
 function handleDragLeave(event: DragEvent) {
-  event.preventDefault()
-  isDragOver.value = false
+  preventDefaults(event)
+  dragCounter--
+  if (dragCounter === 0) {
+    isDragOver.value = false
+  }
 }
 </script>
 
@@ -97,12 +113,15 @@ function handleDragLeave(event: DragEvent) {
   position: relative;
   border: 2px dashed var(--color-border);
   background: var(--color-background);
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 4px;
 }
 
 .upload-area:hover {
   border-color: var(--color-primary);
   background: var(--color-surface);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--tui-drag-bg);
 }
 
 .file-input {
@@ -116,7 +135,9 @@ function handleDragLeave(event: DragEvent) {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  position: relative;
 }
 
 .upload-label:hover {
@@ -124,9 +145,30 @@ function handleDragLeave(event: DragEvent) {
 }
 
 .upload-label.drag-over {
-  background: var(--color-surface);
-  border-color: var(--color-primary);
+  background: var(--tui-primary);
+  color: white;
+  border-color: var(--tui-primary);
+  box-shadow: 0 8px 25px var(--tui-drag-shadow);
 }
+
+.upload-area.drag-over {
+  border-color: var(--tui-primary);
+  border-style: solid;
+  background: var(--tui-primary);
+}
+
+.upload-label.drag-over {
+  color: white;
+}
+
+.upload-label.drag-over .placeholder {
+  color: white;
+}
+
+.upload-label.drag-over .placeholder small {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 
 @media (min-width: 640px) {
   .upload-label {
