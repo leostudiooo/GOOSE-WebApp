@@ -12,7 +12,7 @@ function getDefaultUser(): User {
     finishImage: '',
     route: '梅园田径场',
     customTrack: {
-      enable: false,
+      enable: true,
       filePath: '',
     },
   }
