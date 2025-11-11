@@ -698,17 +698,17 @@ function resizeCanvas() {
   background: transparent;
   border: none;
   overflow: hidden;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .prts-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 25px;
-  background: var(--color-surface);
+  padding: 15px 20px 12px;
+  background: var(--color-surface-raised);
   color: var(--color-text);
-  border-bottom: 2px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .prts-header h3 {
@@ -717,35 +717,41 @@ function resizeCanvas() {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .close-btn {
-  background: var(--color-text-muted);
-  border: 2px solid var(--color-text-muted);
-  color: var(--color-background);
-  font-size: 16px;
+  background: var(--color-surface-interactive);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text);
+  font-size: 12px;
   cursor: pointer;
-  padding: 6px 12px;
-  font-family: 'Courier New', monospace;
+  padding: 4px 8px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   transition: all 0.2s;
   letter-spacing: 1px;
+  min-width: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
-  background: var(--color-background);
-  color: var(--color-text-muted);
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-background);
 }
 
 .prts-toolbar {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 20px 25px;
-  background: var(--color-background);
-  border-bottom: 2px solid var(--color-border);
+  padding: 15px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
   flex-wrap: wrap;
 }
 
@@ -761,17 +767,17 @@ function resizeCanvas() {
   color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 
 .time-input {
   width: 60px;
   padding: 6px 8px;
-  border: 2px solid var(--color-border);
-  background: var(--color-background);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-interactive);
   color: var(--color-text);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 11px;
   font-weight: bold;
   outline: none;
@@ -801,11 +807,11 @@ function resizeCanvas() {
 .stat {
   background: var(--color-surface);
   padding: 6px 12px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   font-size: 11px;
   font-weight: bold;
   color: var(--color-text);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   height: 28px;
   display: inline-flex;
@@ -820,12 +826,13 @@ function resizeCanvas() {
 
 .btn {
   padding: 8px 16px;
-  border: 2px solid;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-interactive);
   cursor: pointer;
   font-size: 11px;
   font-weight: bold;
   transition: all 0.2s;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -840,14 +847,14 @@ function resizeCanvas() {
 }
 
 .btn-warning {
-  background: #f39c12;
-  border-color: #f39c12;
-  color: white;
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  color: var(--color-background);
 }
 
 .btn-warning:hover {
   background: var(--color-background);
-  color: #f39c12;
+  color: var(--color-warning);
 }
 
 .btn-success {
@@ -874,17 +881,17 @@ function resizeCanvas() {
 
 .prts-main {
   display: flex;
-  gap: 25px;
-  padding: 25px;
+  gap: 20px;
+  padding: 15px;
   min-height: 400px;
-  background: var(--color-background);
+  background: var(--color-surface);
   overflow: hidden;
 }
 
 .map-container {
   flex: 1;
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   position: relative;
   overflow: hidden;
   height: 400px;
@@ -900,7 +907,7 @@ function resizeCanvas() {
 .points-panel {
   width: 280px;
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   display: flex;
   flex-direction: column;
   height: 400px;
@@ -911,8 +918,8 @@ function resizeCanvas() {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 2px solid var(--color-border);
-  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-raised);
 }
 
 .panel-header {
@@ -924,7 +931,7 @@ function resizeCanvas() {
   margin: 0;
   color: var(--color-text);
   font-size: 16px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -934,7 +941,7 @@ function resizeCanvas() {
   margin-top: 4px;
   font-size: 10px;
   color: var(--color-success);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
@@ -952,14 +959,14 @@ function resizeCanvas() {
   gap: 10px;
   padding: 8px 12px;
   margin-bottom: 4px;
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface-interactive);
+  border: 1px solid var(--color-border-subtle);
   transition: all 0.3s;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .point-item.active {
-  background: var(--color-surface);
+  background: var(--color-primary-bg);
   border-color: var(--color-primary);
 }
 
@@ -974,12 +981,12 @@ function resizeCanvas() {
   justify-content: center;
   font-size: 12px;
   font-weight: bold;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .point-coords {
   flex: 1;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 12px;
   color: var(--color-text);
 }
@@ -997,7 +1004,7 @@ function resizeCanvas() {
   font-size: 14px;
   line-height: 1;
   transition: background-color 0.3s;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
 }
 
@@ -1009,7 +1016,7 @@ function resizeCanvas() {
   text-align: center;
   color: var(--color-text-muted);
   padding: 40px 20px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-size: 13px;
 }
 

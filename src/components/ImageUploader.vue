@@ -105,23 +105,21 @@ function handleDragLeave(event: DragEvent) {
 <style scoped>
 .image-uploader {
   margin-bottom: 25px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 
 .upload-area {
   position: relative;
-  border: 2px dashed var(--color-border);
-  background: var(--color-background);
+  border: 2px dashed var(--color-border-subtle);
+  background: var(--color-surface);
   transition: all 0.3s ease;
-  border-radius: 4px;
 }
 
 .upload-area:hover {
   border-color: var(--color-primary);
-  background: var(--color-surface);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--tui-drag-bg);
+  background: var(--color-surface-interactive);
+  border-style: dashed;
 }
 
 .file-input {
@@ -136,7 +134,6 @@ function handleDragLeave(event: DragEvent) {
   justify-content: center;
   padding: 20px;
   transition: all 0.3s ease;
-  border-radius: 4px;
   position: relative;
 }
 
@@ -154,7 +151,7 @@ function handleDragLeave(event: DragEvent) {
 .upload-area.drag-over {
   border-color: var(--tui-primary);
   border-style: solid;
-  background: var(--tui-primary);
+  background: var(--tui-primary-bg);
 }
 
 .upload-label.drag-over {
@@ -204,7 +201,7 @@ function handleDragLeave(event: DragEvent) {
 .placeholder p {
   margin: 0 0 8px 0;
   font-size: 13px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -212,7 +209,7 @@ function handleDragLeave(event: DragEvent) {
 .placeholder small {
   font-size: 11px;
   color: var(--color-text-muted);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   margin: 0;
 }
 
@@ -227,7 +224,7 @@ function handleDragLeave(event: DragEvent) {
   padding: 6px 10px;
   font-size: 12px;
   color: var(--color-text-muted);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   word-break: break-all;

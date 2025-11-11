@@ -298,9 +298,8 @@ function clearCustomTrack() {
 .track-selector {
   padding: 0;
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
   margin-top: 0;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .track-content {
@@ -391,8 +390,8 @@ h3 {
   text-align: center;
   margin: 0 0 15px 0;
   padding: 15px 20px 12px;
-  border-bottom: 2px solid var(--color-border);
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .radio-group {
@@ -411,14 +410,13 @@ h3 {
   padding: 12px 15px;
   cursor: pointer;
   transition: all 0.2s;
-  border: 2px solid var(--color-border);
-  background: var(--color-background);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
   margin-bottom: 8px;
 }
 
 .radio-option:hover {
-  background-color: var(--color-surface);
-  border-color: var(--color-primary);
+  background-color: var(--color-surface-interactive);
 }
 
 .radio-option input[type='radio'] {
@@ -444,14 +442,13 @@ h3 {
   font-size: 14px;
   color: var(--color-text);
   user-select: none;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .custom-track-options {
   margin: 20px 0;
   padding: 20px;
-  background: var(--color-background);
-  border: 2px solid var(--color-border);
+  background: var(--color-surface-raised);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -468,7 +465,7 @@ h3 {
   margin: 0;
   font-size: 14px;
   color: var(--color-text);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   white-space: nowrap;
 }
 
@@ -476,12 +473,12 @@ h3 {
   padding: 12px 24px;
   background: var(--color-primary);
   color: var(--color-background);
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
   font-size: 13px;
   font-weight: bold;
   transition: all 0.2s;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -505,26 +502,24 @@ h3 {
 
 .upload-area {
   position: relative;
-  border: 2px dashed var(--color-border);
-  background: var(--color-background);
+  border: 2px dashed var(--color-border-subtle);
+  background: var(--color-surface);
   transition: all 0.3s ease;
   min-height: 100px;
-  border-radius: 6px;
   margin: 15px 0;
 }
 
 .upload-area:hover {
   border-color: var(--color-primary);
-  background: var(--color-surface);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px var(--tui-drag-bg);
+  background: var(--color-surface-interactive);
+  border-style: dashed;
 }
 
 .upload-area.drag-over {
   border-color: var(--tui-primary);
   border-style: solid;
-  background: var(--tui-primary);
-  color: white;
+  background: var(--tui-primary-bg);
+  color: var(--color-text);
 }
 
 .upload-area.drag-over .upload-label,
@@ -565,7 +560,7 @@ h3 {
 .upload-placeholder p {
   margin: 0 0 4px 0;
   font-size: 12px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: bold;
@@ -574,7 +569,7 @@ h3 {
 .upload-placeholder small {
   font-size: 10px;
   color: var(--color-text-muted);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .track-loaded {
@@ -606,7 +601,7 @@ h3 {
   font-size: 12px;
   font-weight: bold;
   color: var(--color-success);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -614,7 +609,7 @@ h3 {
 .track-stats {
   font-size: 10px;
   color: var(--color-text-muted);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   margin: 0;
 }
 
@@ -647,13 +642,13 @@ h3 {
   padding: 10px 20px;
   background: var(--color-primary);
   color: var(--color-background);
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
   font-size: 13px;
   font-weight: bold;
   margin-bottom: 8px;
   transition: all 0.2s;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -705,7 +700,7 @@ h3 {
   background: var(--color-surface);
   padding: 30px;
   margin: 25px 0;
-  border: 2px solid var(--color-border);
+  background: var(--color-surface-interactive);
 }
 
 .invitation-text {
@@ -715,7 +710,7 @@ h3 {
   margin: 0 0 15px 0;
   padding: 0 8px;
   font-weight: bold;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .action-buttons {
@@ -732,7 +727,7 @@ h3 {
   padding: 12px 20px;
   background: var(--color-primary);
   color: var(--color-background);
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
   font-size: 13px;
   font-weight: bold;
@@ -740,7 +735,7 @@ h3 {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 3px;
@@ -764,7 +759,7 @@ h3 {
   font-size: 12px;
   font-weight: bold;
   padding: 8px 12px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   align-self: center;
 }
@@ -791,7 +786,7 @@ h3 {
   padding: 8px 12px;
   font-size: 11px;
   color: var(--color-text-muted);
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   word-break: break-all;

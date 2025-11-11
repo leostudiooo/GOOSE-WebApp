@@ -110,9 +110,8 @@ onMounted(async () => {
 .config-form {
   padding: 0;
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
   margin: 0;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .config-content {
@@ -173,13 +172,13 @@ label {
 .form-control {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid var(--color-border);
-  background: var(--color-background);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-interactive);
   color: var(--color-text);
   font-size: 14px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 
@@ -192,7 +191,7 @@ small {
   margin-top: 6px;
   color: var(--color-text-muted);
   font-size: 12px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
 .btn-now {
@@ -200,9 +199,9 @@ small {
   padding: 6px 12px;
   background: var(--color-primary);
   color: var(--color-background);
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-primary);
   cursor: pointer;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   font-size: 12px;
@@ -238,7 +237,7 @@ h2 {
   color: var(--color-text);
   text-align: center;
   padding: 15px 20px 12px;
-  border-bottom: 2px solid var(--color-border);
-  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-raised);
 }
 </style>

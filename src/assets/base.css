@@ -2,62 +2,110 @@
 :root {
   /* Light theme */
   --tui-bg: #ffffff;
-  --tui-surface: #f5f5f5;
+  --tui-surface: #f8f9fa;
+  --tui-surface-raised: #f0f1f3;
+  --tui-surface-interactive: #e9ecef;
   --tui-border: #333333;
+  --tui-border-subtle: rgba(51, 51, 51, 0.1);
   --tui-text: #000000;
   --tui-text-muted: #666666;
   --tui-primary: #0066cc;
   --tui-primary-hover: #0052a3;
+  --tui-primary-bg: rgba(0, 102, 204, 0.05);
   --tui-success: #008800;
+  --tui-success-bg: rgba(0, 136, 0, 0.05);
   --tui-danger: #cc0000;
+  --tui-danger-bg: rgba(204, 0, 0, 0.05);
   --tui-warning: #cc6600;
+  --tui-warning-bg: rgba(204, 102, 0, 0.05);
   --tui-accent: #6633cc;
+  --tui-accent-bg: rgba(102, 51, 204, 0.05);
   --tui-drag-bg: rgba(0, 102, 204, 0.1);
   --tui-drag-shadow: rgba(0, 102, 204, 0.3);
+  
+  /* Retro 3D shadows */
+  --shadow-inset: inset 1px 1px 0 rgba(255, 255, 255, 0.8), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
+  --shadow-raised: 1px 1px 0 rgba(255, 255, 255, 0.8), 2px 2px 0 rgba(0, 0, 0, 0.1);
+  --shadow-pressed: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-window: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
   
   /* Common colors */
   --color-background: var(--tui-bg);
   --color-surface: var(--tui-surface);
+  --color-surface-raised: var(--tui-surface-raised);
+  --color-surface-interactive: var(--tui-surface-interactive);
   --color-border: var(--tui-border);
+  --color-border-subtle: var(--tui-border-subtle);
   --color-text: var(--tui-text);
   --color-text-muted: var(--tui-text-muted);
   --color-primary: var(--tui-primary);
+  --color-primary-bg: var(--tui-primary-bg);
   --color-success: var(--tui-success);
+  --color-success-bg: var(--tui-success-bg);
   --color-danger: var(--tui-danger);
+  --color-danger-bg: var(--tui-danger-bg);
 }
 
 /* Dark theme */
 [data-theme="dark"] {
   --tui-bg: #1a1a1a;
   --tui-surface: #2a2a2a;
+  --tui-surface-raised: #333333;
+  --tui-surface-interactive: #3a3a3a;
   --tui-border: #cccccc;
+  --tui-border-subtle: rgba(204, 204, 204, 0.1);
   --tui-text: #f0f0f0;
   --tui-text-muted: #999999;
   --tui-primary: #3399ff;
   --tui-primary-hover: #2680db;
+  --tui-primary-bg: rgba(51, 153, 255, 0.1);
   --tui-success: #00cc00;
+  --tui-success-bg: rgba(0, 204, 0, 0.1);
   --tui-danger: #ff3333;
+  --tui-danger-bg: rgba(255, 51, 51, 0.1);
   --tui-warning: #ff9933;
+  --tui-warning-bg: rgba(255, 153, 51, 0.1);
   --tui-accent: #9966ff;
+  --tui-accent-bg: rgba(153, 102, 255, 0.1);
   --tui-drag-bg: rgba(51, 153, 255, 0.1);
   --tui-drag-shadow: rgba(51, 153, 255, 0.4);
+  
+  /* Dark theme shadows */
+  --shadow-inset: inset 1px 1px 0 rgba(255, 255, 255, 0.1), inset -1px -1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-raised: 1px 1px 0 rgba(255, 255, 255, 0.1), 2px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-pressed: inset 1px 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-window: 0 8px 24px rgba(0, 0, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --tui-bg: #1a1a1a;
     --tui-surface: #2a2a2a;
+    --tui-surface-raised: #333333;
+    --tui-surface-interactive: #3a3a3a;
     --tui-border: #cccccc;
+    --tui-border-subtle: rgba(204, 204, 204, 0.1);
     --tui-text: #f0f0f0;
     --tui-text-muted: #999999;
     --tui-primary: #3399ff;
     --tui-primary-hover: #2680db;
+    --tui-primary-bg: rgba(51, 153, 255, 0.1);
     --tui-success: #00cc00;
+    --tui-success-bg: rgba(0, 204, 0, 0.1);
     --tui-danger: #ff3333;
+    --tui-danger-bg: rgba(255, 51, 51, 0.1);
     --tui-warning: #ff9933;
+    --tui-warning-bg: rgba(255, 153, 51, 0.1);
     --tui-accent: #9966ff;
+    --tui-accent-bg: rgba(153, 102, 255, 0.1);
     --tui-drag-bg: rgba(51, 153, 255, 0.1);
     --tui-drag-shadow: rgba(51, 153, 255, 0.4);
+    
+    /* Dark theme shadows */
+    --shadow-inset: inset 1px 1px 0 rgba(255, 255, 255, 0.1), inset -1px -1px 0 rgba(0, 0, 0, 0.4);
+    --shadow-raised: 1px 1px 0 rgba(255, 255, 255, 0.1), 2px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-pressed: inset 1px 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-window: 0 8px 24px rgba(0, 0, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -78,9 +126,19 @@ body {
     background-color 0.2s;
   line-height: 1.5;
   font-family:
-    'Courier New',
+    'JetBrains Mono',
+    'Fira Code',
+    'Source Code Pro',
+    'SF Mono',
+    Monaco,
+    'Cascadia Code',
+    'Roboto Mono',
+    Consolas,
+    'Liberation Mono',
+    Menlo,
     Courier,
-    monospace;
+    monospace,
+    sans-serif;
   font-size: 14px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

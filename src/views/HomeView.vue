@@ -2,6 +2,13 @@
   <div class="home-view">
     <div class="app-window">
         <div class="titlebar">
+          <div class="window-controls">
+            <div class="traffic-lights">
+              <span class="traffic-light close"></span>
+              <span class="traffic-light minimize"></span>
+              <span class="traffic-light maximize"></span>
+            </div>
+          </div>
           <div class="titlebar-center">
             <span class="logo-emoji">🪿</span>
             <span class="title">GOOSE</span>
@@ -147,12 +154,12 @@ const canUpload = computed(() => {
     userStore.finishImageFile &&
     userStore.user.route
   )
-  
+
   // 如果启用了自定义轨迹，还需要有轨迹数据
-  const hasTrackData = userStore.user.customTrack.enable ? 
-    !!userStore.customTrackData : 
+  const hasTrackData = userStore.user.customTrack.enable ?
+    !!userStore.customTrackData :
     true // 默认轨迹不需要额外检查
-  
+
   // 必须已经成功验证过 token
   return hasBasicFields && hasTrackData && isTokenValidated.value
 })
@@ -182,11 +189,11 @@ async function handleValidation() {
 
     if (result.isValid) {
       isTokenValidated.value = true // 标记为已验证
-      
+
       // 保存验证结果，供上传时复用
       validatedApiClient.value = verificationService.getApiClient()
       validatedStudentId.value = result.studentId || ''
-      
+
       let successMessage = '配置验证通过！用户信息：'
       // 使用 masked data 显示敏感信息
       const maskedInfo = getMaskedUserInfo({
@@ -234,22 +241,22 @@ async function handleUpload() {
     toast.error('请先填写 Token')
     return
   }
-  
+
   if (!userStore.user.route) {
     toast.error('请选择运动场馆')
     return
   }
-  
+
   if (!userStore.startImageFile) {
     toast.error('请上传开始图片')
     return
   }
-  
+
   if (!userStore.finishImageFile) {
     toast.error('请上传结束图片')
     return
   }
-  
+
   // 检查是否有轨迹数据
   if (userStore.user.customTrack.enable && !userStore.customTrackData) {
     toast.error('请上传轨迹文件或绘制自定义轨迹')
@@ -271,7 +278,7 @@ async function handleUpload() {
       },
       (message, type) => {
         if (type === 'info') toast.info(message)
-        else if (type === 'success') toast.success(message)  
+        else if (type === 'success') toast.success(message)
         else if (type === 'error') toast.error(message)
       }
     )
@@ -363,8 +370,10 @@ function handleImportTrack(track: Track) {
 }
 
 .app-window {
-  border: 2px solid var(--color-border);
-  background: var(--color-background);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
   overflow: hidden;
   flex: 1;
@@ -381,7 +390,7 @@ function handleImportTrack(track: Track) {
   align-items: center;
   padding: 8px 15px;
   background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-subtle);
   min-height: 32px;
   position: relative;
 }
@@ -395,7 +404,7 @@ function handleImportTrack(track: Track) {
 .title {
   font-size: 14px;
   font-weight: bold;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -406,14 +415,15 @@ function handleImportTrack(track: Track) {
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  background: transparent;
-  border: 1px solid var(--color-border);
+  background: var(--color-surface-interactive);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px;
   color: var(--color-text);
   padding: 4px 8px;
   cursor: pointer;
   font-size: 12px;
   transition: all 0.2s;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   min-width: 28px;
   height: 24px;
   display: flex;
@@ -425,6 +435,40 @@ function handleImportTrack(track: Track) {
   border-color: var(--color-primary);
   background: var(--color-primary);
   color: var(--color-background);
+}
+
+.window-controls {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.traffic-lights {
+  display: flex;
+  gap: 8px;
+}
+
+.traffic-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.traffic-light.close {
+  background: #ff5f57;
+  border: 1px solid #e0443e;
+}
+
+.traffic-light.minimize {
+  background: #ffbd2e;
+  border: 1px solid #dea123;
+}
+
+.traffic-light.maximize {
+  background: #28ca42;
+  border: 1px solid #1aad29;
 }
 
 .logo-emoji {
@@ -461,7 +505,6 @@ function handleImportTrack(track: Track) {
 
 .config-column > * {
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
   padding: 0;
   margin: 0;
 }
@@ -469,7 +512,6 @@ function handleImportTrack(track: Track) {
 .upload-column > .prts-wrapper,
 .upload-column > .track-selector {
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
   padding: 0;
   margin: 0;
 }
@@ -479,7 +521,7 @@ function handleImportTrack(track: Track) {
   color: var(--color-text-muted);
   font-size: 11px;
   max-width: 2000px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   padding: 20px;
   flex-shrink: 0;
 }
@@ -627,7 +669,6 @@ function handleImportTrack(track: Track) {
   margin: 0;
   padding: 0;
   background: var(--color-surface);
-  border: 2px solid var(--color-border);
   overflow: hidden;
 }
 
@@ -654,8 +695,8 @@ function handleImportTrack(track: Track) {
 /* Upload controls at bottom of window */
 .upload-controls {
   padding: 15px 20px;
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-raised);
   display: flex;
   gap: 12px;
   justify-content: flex-end;
@@ -663,11 +704,12 @@ function handleImportTrack(track: Track) {
 
 .upload-btn {
   padding: 10px 16px;
-  border: 2px solid;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-interactive);
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.2s;
@@ -708,99 +750,6 @@ function handleImportTrack(track: Track) {
   opacity: 0.5;
 }
 
-/* Custom scrollbar styles - Main window content */
-.window-content::-webkit-scrollbar {
-  width: 16px;
-  background: var(--color-surface);
-}
 
-.window-content::-webkit-scrollbar-track {
-  background: var(--color-surface);
-  border-left: 1px solid var(--color-border);
-  border-radius: 0;
-}
-
-.window-content::-webkit-scrollbar-thumb {
-  background: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  min-height: 30px;
-  background-clip: padding-box;
-}
-
-.window-content::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text);
-  border-color: var(--color-border);
-}
-
-.window-content::-webkit-scrollbar-thumb:active {
-  background: var(--color-primary);
-  border-color: var(--color-border);
-}
-
-.window-content::-webkit-scrollbar-corner {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-}
-
-/* Custom scrollbar for other scrollable elements */
-.prts-wrapper::-webkit-scrollbar,
-.config-column > *::-webkit-scrollbar,
-.upload-column > *::-webkit-scrollbar {
-  width: 12px;
-  background: var(--color-surface);
-}
-
-.prts-wrapper::-webkit-scrollbar-track,
-.config-column > *::-webkit-scrollbar-track,
-.upload-column > *::-webkit-scrollbar-track {
-  background: var(--color-surface);
-  border-left: 1px solid var(--color-border);
-  border-radius: 0;
-}
-
-.prts-wrapper::-webkit-scrollbar-thumb,
-.config-column > *::-webkit-scrollbar-thumb,
-.upload-column > *::-webkit-scrollbar-thumb {
-  background: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  min-height: 24px;
-  background-clip: padding-box;
-}
-
-.prts-wrapper::-webkit-scrollbar-thumb:hover,
-.config-column > *::-webkit-scrollbar-thumb:hover,
-.upload-column > *::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text);
-  border-color: var(--color-border);
-}
-
-.prts-wrapper::-webkit-scrollbar-thumb:active,
-.config-column > *::-webkit-scrollbar-thumb:active,
-.upload-column > *::-webkit-scrollbar-thumb:active {
-  background: var(--color-primary);
-  border-color: var(--color-border);
-}
-
-.prts-wrapper::-webkit-scrollbar-corner,
-.config-column > *::-webkit-scrollbar-corner,
-.upload-column > *::-webkit-scrollbar-corner {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-}
-
-/* Firefox scrollbar */
-.window-content {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-text-muted) var(--color-surface);
-}
-
-.prts-wrapper,
-.config-column > *,
-.upload-column > * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-text-muted) var(--color-surface);
-}
 
 </style>
