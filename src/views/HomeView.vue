@@ -68,8 +68,8 @@
 
     <footer class="footer">
       <p>
-        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a> 项目开发 |
-        GPL-3.0 License
+        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a>、<a href="https://github.com/leostudiooo/PRTS" target="_blank">PRTS</a> 和 <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank">ML-SEU-Exercise-Helper</a> 开发 |
+        <a href="https://opensource.org/licenses/GPL-3.0" target="_blank">GPL-3.0 License</a>
       </p>
       <p class="warning">
         ⚠️ 本软件按"原样"提供，不附带任何担保。用户应对其上传的数据承担全部责任。
