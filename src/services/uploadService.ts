@@ -29,17 +29,14 @@ export class UploadService {
     this.onProgress?.({ step, completed, error })
   }
 
-  private async convertImageToFile(imageDataUrl: string, filename: string): Promise<File> {
-    const response = await fetch(imageDataUrl)
-    const blob = await response.blob()
-    return new File([blob], filename, { type: 'image/jpeg' })
-  }
 
   async uploadExerciseRecord(
     user: User,
     headers: Headers,
     route: Route,
-    track: TrackPoint[]
+    track: TrackPoint[],
+    startImageFile: File,
+    finishImageFile: File
   ): Promise<UploadResult> {
     try {
       this.updateProgress('Validating configuration', false)
@@ -58,13 +55,11 @@ export class UploadService {
       this.updateProgress('Validation completed', true)
       this.updateProgress('Uploading start image', false)
 
-      const startImageFile = await this.convertImageToFile(user.startImage, '1.jpg')
       const startImageUrl = await apiClient.uploadStartImage(startImageFile)
 
       this.updateProgress('Start image uploaded', true)
       this.updateProgress('Uploading finish image', false)
 
-      const finishImageFile = await this.convertImageToFile(user.finishImage, '1.jpg')
       const finishImageUrl = await apiClient.uploadFinishImage(finishImageFile)
 
       this.updateProgress('Finish image uploaded', true)
@@ -104,19 +99,17 @@ export class UploadService {
   }
 
   async uploadImages(
-    startImage: string,
-    finishImage: string,
+    startImageFile: File,
+    finishImageFile: File,
     apiClient: APIClient
   ): Promise<{ startImageUrl: string; finishImageUrl: string }> {
     this.updateProgress('Uploading start image', false)
     
-    const startImageFile = await this.convertImageToFile(startImage, '1.jpg')
     const startImageUrl = await apiClient.uploadStartImage(startImageFile)
     
     this.updateProgress('Start image uploaded', true)
     this.updateProgress('Uploading finish image', false)
     
-    const finishImageFile = await this.convertImageToFile(finishImage, '1.jpg')
     const finishImageUrl = await apiClient.uploadFinishImage(finishImageFile)
     
     this.updateProgress('Finish image uploaded', true)
