@@ -22,6 +22,8 @@ WebApp 版本同时也集成了 [PRTS](https://github.com/leostudiooo/PRTS) 轨�
 
 ## 🚀 快速开始
 
+已经在 https://goose-webapp.pages.dev 上线，可直接访问使用。
+
 ### 运行环境
 
 - Node.js 16+ 
