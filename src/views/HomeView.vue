@@ -11,7 +11,11 @@
         </div>
         <div class="titlebar-center">
           <span class="logo-emoji">🪿</span>
-          <span class="title">GOOSE</span>
+          <span class="title"
+            ><a href="https://github.com/leostudiooo/GOOSE-WebApp" target="_blank"
+              >GOOSE-WebApp</a
+            ></span
+          >
         </div>
         <button
           @click="toggleTheme"
@@ -68,7 +72,16 @@
 
     <footer class="footer">
       <p>
-        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a>、<a href="https://github.com/leostudiooo/PRTS" target="_blank">PRTS</a> 和 <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank">ML-SEU-Exercise-Helper</a> 开发 |
+        基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a>、<a
+          href="https://github.com/leostudiooo/PRTS"
+          target="_blank"
+          >PRTS</a
+        >
+        和
+        <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank"
+          >ML-SEU-Exercise-Helper</a
+        >
+        开发 |
         <a href="https://opensource.org/licenses/GPL-3.0" target="_blank">GPL-3.0 License</a>
       </p>
       <p class="warning">
@@ -419,7 +432,6 @@ function handleImportTrack(track: Track) {
     'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
     'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   color: var(--color-text);
-  text-transform: uppercase;
   letter-spacing: 1px;
 }
 
