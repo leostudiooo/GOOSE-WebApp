@@ -1,1 +1,1 @@
-Refer to @CLAUDE.md for instructions on this repository.
+Refer to @CLAUDE.md for instructions on this repository. MAKE SURE TO READ IT FIRST, BEFORE MAKING ANY SUGGESTIONS OR CHANGES.

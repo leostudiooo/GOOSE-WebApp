@@ -93,3 +93,7 @@ The application uses a consistent Terminal UI aesthetic:
 - Coordinate conversion functions maintain proper aspect ratios for different boundaries
 - All localStorage operations include error handling for storage quota issues
 - Component state transitions use Vue Transitions for smooth UX
+
+### Data Processing Guidelines
+
+- Masked data only should be applied during frontend display; all internal data processing pipelines should use raw, unmasked data
