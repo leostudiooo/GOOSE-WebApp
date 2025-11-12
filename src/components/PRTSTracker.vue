@@ -1,7 +1,7 @@
 <template>
   <div class="prts-tracker-content">
     <div class="prts-header">
-      <h3>[ PRTS — 自定义轨迹规划 ]</h3>
+      <h3>[ PRTS — 轨迹规划 ]</h3>
       <button @click="$emit('close')" class="close-btn btn-compact">关闭</button>
     </div>
     <div class="prts-toolbar">

@@ -16,14 +16,17 @@
 
       <div class="form-group">
         <label for="datetime">锻炼时间:</label>
-        <input
-          id="datetime"
-          v-model="localDateTime"
-          type="datetime-local"
-          class="form-control"
-          @change="updateDateTime"
-        />
-        <button @click="setNow" class="btn-now">现在</button>
+        <div class="datetime-container">
+          <input
+            id="datetime"
+            v-model="localDateTime"
+            type="datetime-local"
+            step="1"
+            class="form-control datetime-input"
+            @change="updateDateTime"
+          />
+          <button @click="setNow" class="btn-now">现在</button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -76,7 +79,8 @@ function formatDateTimeLocal(isoString: string): string {
   const day = String(date.getDate()).padStart(2, '0')
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${year}-${month}-${day}T${hours}:${minutes}`
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
 }
 
 function updateDateTime() {
@@ -184,6 +188,34 @@ label {
   box-sizing: border-box;
 }
 
+.datetime-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.datetime-input {
+  flex: 1;
+  min-width: 180px;
+  max-width: none;
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .datetime-input {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: none;
+  }
+}
+
+@media (max-width: 320px) {
+  .datetime-input {
+    min-width: 140px;
+  }
+}
+
 .form-control:focus {
   border-color: var(--color-primary);
 }
@@ -199,7 +231,6 @@ small {
 }
 
 .btn-now {
-  margin-top: 8px;
   padding: 6px 12px;
   background: var(--color-primary);
   color: var(--color-background);
@@ -212,6 +243,8 @@ small {
   text-transform: uppercase;
   font-size: 12px;
   transition: all 0.2s;
+  flex-shrink: 0;
+  height: fit-content;
 }
 
 .btn-now:hover {

@@ -491,6 +491,14 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 15px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .draw-tool-section {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 .draw-tool-hint {
@@ -501,6 +509,15 @@ h3 {
     'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'SF Mono', Monaco, 'Cascadia Code',
     'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
   white-space: nowrap;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .draw-tool-hint {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+  }
 }
 
 .btn-draw-large {
