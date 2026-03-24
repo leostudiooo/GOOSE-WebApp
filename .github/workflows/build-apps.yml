@@ -24,7 +24,7 @@ jobs:
             bundle: dmg
             target: universal-apple-darwin
             artifact_name: macos-dmg
-            artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
+            artifact_path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
           - os: ubuntu-22.04
             bundle: appimage
             target: ''
