@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "GOOSE",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.goose.sports-tracker",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://*.seu.edu.cn"
     }
   },
   "bundle": {
