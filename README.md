@@ -4,7 +4,7 @@
 
 # GOOSE WebApp 🪿
 
-基于 [GOOSE](https://github.com/leostudiooo/GOOSE) 项目的现代化 Web 应用
+基于 [GOOSE](https://github.com/leostudiooo/GOOSE) 项目的现代化渐进式 Web 应用
 
 ![GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)
 ![Vue 3](https://img.shields.io/badge/vue-3.0%2B-green.svg)
