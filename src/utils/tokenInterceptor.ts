@@ -42,10 +42,7 @@ async function handleTokenFound(token: string): Promise<void> {
 function interceptFetch(): void {
   const originalFetch = window.fetch
 
-  window.fetch = async function (
-    input: RequestInfo | URL,
-    init?: RequestInit,
-  ): Promise<Response> {
+  window.fetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const url =
       typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
 
@@ -106,7 +103,7 @@ function interceptXHR(): void {
   XMLHttpRequest.prototype.open = function (
     method: string,
     url: string | URL,
-    async?: boolean,
+    async: boolean = true,
     username?: string | null,
     password?: string | null,
   ): void {

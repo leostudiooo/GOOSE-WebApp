@@ -1,5 +1,6 @@
 import { WebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { listen } from '@tauri-apps/api/event'
+import { invoke } from '@tauri-apps/api/core'
 
 const CAS_LOGIN_URL =
   'https://auth.seu.edu.cn/dist/#/dist/main/login?service=https%3A%2F%2Ftyxsjpt.seu.edu.cn%2Fapi%2Foauth%2Fanno%2FtokenH5-cas'
@@ -13,7 +14,8 @@ interface LoginResult {
 let loginWindow: WebviewWindow | null = null
 
 export function isTauriEnvironment(): boolean {
-  return '__TAURI__' in window
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return typeof (window as any).__TAURI_INTERNALS__ !== 'undefined'
 }
 
 export async function openLoginWindow(): Promise<LoginResult> {
@@ -55,6 +57,14 @@ export async function openLoginWindow(): Promise<LoginResult> {
       // Listen for window created event
       loginWindow.once('tauri://created', () => {
         console.log('[LoginService] Login window created')
+        // Inject token interceptor script via Rust
+        invoke('inject_token_interceptor')
+          .then(() => {
+            console.log('[LoginService] Token interceptor injected')
+          })
+          .catch((err: unknown) => {
+            console.error('[LoginService] Failed to inject token interceptor:', err)
+          })
       })
 
       // Listen for window close event
@@ -69,11 +79,11 @@ export async function openLoginWindow(): Promise<LoginResult> {
       // Listen for token captured event from Rust backend
       listen('token-captured', (event) => {
         console.log('[LoginService] Token received via event')
-        const payload = event.payload as { token: string }
-        if (payload?.token) {
+        const token = event.payload as string
+        if (token) {
           handleResult({
             success: true,
-            token: payload.token,
+            token: token,
           })
         }
       }).catch((err: unknown) => {
