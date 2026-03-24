@@ -12,9 +12,11 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "GOOSE - 运动打卡系统",
         "width": 800,
         "height": 600,
+        "dragDropEnabled": false,
         "resizable": true,
         "fullscreen": false
       }
