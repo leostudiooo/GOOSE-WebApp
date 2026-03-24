@@ -28,6 +28,15 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "homepage": "https://github.com/leostudiooo/GOOSE-WebApp",
+    "shortDescription": "运动打卡系统（GOOSE WebApp）",
+    "copyright": "基于 GOOSE / PRTS / ML-SEU-Exercise-Helper 开发 | GPL-3.0 | 本软件按\"原样\"提供，不附带任何担保。",
+    "resources": [
+      "Credits.rtf"
+    ],
+    "macOS": {
+      "infoPlist": "Info.plist"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

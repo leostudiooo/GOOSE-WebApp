@@ -1,7 +1,7 @@
 <template>
-  <div class="home-view">
-    <div class="app-window">
-      <div class="titlebar">
+  <div class="home-view" :class="{ 'is-tauri': isTauri }">
+    <div class="app-window" :class="{ 'is-tauri': isTauri }">
+      <div v-if="!isTauri" class="titlebar">
         <div class="window-controls">
           <div class="traffic-lights">
             <span class="traffic-light close"></span>
@@ -11,19 +11,15 @@
         </div>
         <div class="titlebar-center">
           <span class="logo-emoji">🪿</span>
-          <span class="title"
-            ><a href="https://github.com/leostudiooo/GOOSE-WebApp" target="_blank"
-              >GOOSE-WebApp</a
-            ></span
-          >
+          <span class="title"><a href="https://github.com/leostudiooo/GOOSE-WebApp"
+              target="_blank">GOOSE-WebApp</a></span>
         </div>
-        <button
-          @click="toggleTheme"
-          class="theme-toggle"
-          :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
-        >
-          {{ isDark ? '☀️' : '🌙' }}
-        </button>
+        <div class="titlebar-right">
+          <button @click="toggleTheme" class="theme-toggle"
+            :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
+            {{ isDark ? '☀️' : '🌙' }}
+          </button>
+        </div>
       </div>
 
       <div class="window-content">
@@ -33,18 +29,10 @@
           </div>
           <div class="column upload-column">
             <Transition name="component-fade" mode="out-in">
-              <TrackSelector
-                v-if="!showPRTSTracker"
-                key="track-selector"
-                @showPRTS="handleShowPRTS"
-              />
+              <TrackSelector v-if="!showPRTSTracker" key="track-selector" @showPRTS="handleShowPRTS" />
               <div v-else key="prts-tracker" class="prts-wrapper">
-                <PRTSTracker
-                  :route-name="userStore.user.route"
-                  :load-route-boundary="loadRouteBoundary"
-                  @close="handleClosePRTS"
-                  @importTrack="handleImportTrack"
-                />
+                <PRTSTracker :route-name="userStore.user.route" :load-route-boundary="loadRouteBoundary"
+                  @close="handleClosePRTS" @importTrack="handleImportTrack" />
               </div>
             </Transition>
           </div>
@@ -53,34 +41,21 @@
 
       <!-- Upload controls at bottom of window -->
       <div class="upload-controls">
-        <button
-          @click="handleValidation"
-          class="upload-btn validation-btn"
-          :disabled="!canValidate || isValidating"
-        >
+        <button @click="handleValidation" class="upload-btn validation-btn" :disabled="!canValidate || isValidating">
           {{ isValidating ? '验证中...' : '验证配置' }}
         </button>
-        <button
-          @click="handleUpload"
-          class="upload-btn upload-btn-main"
-          :disabled="!canUpload || isUploading"
-        >
+        <button @click="handleUpload" class="upload-btn upload-btn-main" :disabled="!canUpload || isUploading">
           {{ isUploading ? '上传中...' : '上传记录' }}
         </button>
       </div>
     </div>
 
-    <footer class="footer">
+    <footer v-if="!isTauri" class="footer">
       <p>
         基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a>、<a
-          href="https://github.com/leostudiooo/PRTS"
-          target="_blank"
-          >PRTS</a
-        >
+          href="https://github.com/leostudiooo/PRTS" target="_blank">PRTS</a>
         和
-        <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank"
-          >ML-SEU-Exercise-Helper</a
-        >
+        <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank">ML-SEU-Exercise-Helper</a>
         开发 |
         <a href="https://opensource.org/licenses/GPL-3.0" target="_blank">GPL-3.0 License</a>
       </p>
@@ -101,6 +76,7 @@ import TrackSelector from '@/components/TrackSelector.vue'
 import PRTSTracker from '@/components/PRTSTracker.vue'
 import { loadRouteBoundary } from '@/utils/boundaryLoader'
 import { VerificationService } from '@/services/verificationService'
+import { isTauriEnvironment } from '@/services/loginService'
 import { UploadService, type UploadProgress } from '@/services/uploadService'
 import { APIClient } from '@/services/api'
 import { useToast } from 'vue-toastification'
@@ -120,6 +96,7 @@ const validationResult = ref<string>('')
 const isTokenValidated = ref(false) // 跟踪 token 是否已成功验证
 const validatedApiClient = ref<APIClient | null>(null) // 存储已验证的 API client
 const validatedStudentId = ref<string>('') // 存储已验证的学生ID
+const isTauri = ref(false)
 
 // 监听 token 变化，重置验证状态
 watch(
@@ -352,6 +329,7 @@ watch(showPRTSTracker, (newVal) => {
 })
 
 onMounted(async () => {
+  isTauri.value = isTauriEnvironment()
   // Load saved theme
   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'auto' | null
   if (savedTheme) {
@@ -391,6 +369,10 @@ function handleImportTrack(track: Track) {
   overflow: hidden;
 }
 
+.home-view.is-tauri {
+  padding: 0;
+}
+
 .app-window {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border-subtle);
@@ -406,6 +388,34 @@ function handleImportTrack(track: Track) {
   transition: all 0.4s ease;
   min-height: 0;
   max-height: 100%;
+}
+
+.app-window.is-tauri {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.tauri-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-bottom: 4px;
+}
+
+.tauri-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tauri-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .titlebar {
@@ -435,11 +445,17 @@ function handleImportTrack(track: Track) {
   letter-spacing: 1px;
 }
 
-.theme-toggle {
+.titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.theme-toggle {
   background: var(--color-surface-interactive);
   border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
@@ -530,14 +546,14 @@ function handleImportTrack(track: Track) {
   transition: all 0.4s ease;
 }
 
-.config-column > * {
+.config-column>* {
   background: var(--color-surface);
   padding: 0;
   margin: 0;
 }
 
-.upload-column > .prts-wrapper,
-.upload-column > .track-selector {
+.upload-column>.prts-wrapper,
+.upload-column>.track-selector {
   background: var(--color-surface);
   padding: 0;
   margin: 0;
@@ -702,11 +718,11 @@ function handleImportTrack(track: Track) {
 }
 
 /* Ensure column children have no extra margins */
-.config-column > *:not(:last-child) {
+.config-column>*:not(:last-child) {
   margin-bottom: 0;
 }
 
-.upload-column > * {
+.upload-column>* {
   margin: 0;
 }
 
