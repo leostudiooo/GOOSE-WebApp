@@ -91,3 +91,9 @@ export interface FinishRecord extends StartRecord {
   id: string
   nowStatus: string
 }
+
+export interface LoginResult {
+  success: boolean
+  token?: string
+  error?: string
+}
