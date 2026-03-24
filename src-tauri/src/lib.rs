@@ -24,10 +24,7 @@ pub fn run() {
 
 #[tauri::command]
 fn token_captured(token: String, app: tauri::AppHandle) {
-    log::info!(
-        "[Rust] token_captured called with token: {}...",
-        &token[..20.min(token.len())]
-    );
+    log::info!("[Rust] token_captured called");
     let _ = app.emit("token-captured", &token);
     if let Some(window) = app.get_webview_window("cas-login") {
         let _ = window.close();
@@ -87,7 +84,7 @@ const TOKEN_INTERCEPTOR_SCRIPT: &str = r#"
 
   async function handleTokenFound(token) {
     if (tokenSent) return;
-    console.log('[TokenInterceptor] Token detected:', token.substring(0, 20) + '...');
+    console.log('[TokenInterceptor] Token detected');
     capturedToken = token;
     
     // Wait for Tauri API to be ready, then send

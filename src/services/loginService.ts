@@ -1,16 +1,7 @@
-import { listen } from '@tauri-apps/api/event'
-import { invoke } from '@tauri-apps/api/core'
+import type { LoginResult } from '@/types'
+import { isTauriEnvironment } from '@/utils/tauriEnv'
 
-interface LoginResult {
-  success: boolean
-  token?: string
-  error?: string
-}
-
-export function isTauriEnvironment(): boolean {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return typeof (window as any).__TAURI_INTERNALS__ !== 'undefined'
-}
+export { isTauriEnvironment }
 
 export async function openLoginWindow(): Promise<LoginResult> {
   if (!isTauriEnvironment()) {
@@ -33,51 +24,45 @@ export async function openLoginWindow(): Promise<LoginResult> {
 
     let unlisten: (() => void) | undefined
 
-    try {
-      // Listen for token captured event from Rust backend
-      listen<string>('token-captured', (event) => {
-        console.log(
-          '[LoginService] Token received via event:',
-          event.payload.substring(0, 20) + '...',
-        )
-        handleResult({
-          success: true,
-          token: event.payload,
-        })
-      })
-        .then((unlistenFn) => {
+    Promise.all([
+      import('@tauri-apps/api/event').then((m) => m.listen),
+      import('@tauri-apps/api/core').then((m) => m.invoke),
+    ])
+      .then(([listen, invoke]) => {
+        // Listen for token captured event from Rust backend
+        return listen<string>('token-captured', (event) => {
+          console.log('[LoginService] Token received')
+          handleResult({
+            success: true,
+            token: event.payload,
+          })
+        }).then((unlistenFn) => {
           unlisten = unlistenFn
           // After listener is ready, open the login window via Rust command
           return invoke('open_login_window')
         })
-        .then(() => {
-          console.log('[LoginService] Login window opened')
-        })
-        .catch((err: unknown) => {
-          console.error('[LoginService] Failed:', err)
-          handleResult({
-            success: false,
-            error: err instanceof Error ? err.message : '打开登录窗口失败',
-          })
-        })
-
-      // Set timeout for login
-      setTimeout(() => {
-        if (!resolved) {
-          console.log('[LoginService] Login timeout')
-          handleResult({
-            success: false,
-            error: '登录超时，请重试',
-          })
-        }
-      }, 300000) // 5 minutes timeout
-    } catch (error) {
-      console.error('[LoginService] Failed:', error)
-      handleResult({
-        success: false,
-        error: error instanceof Error ? error.message : '创建登录窗口失败',
       })
-    }
+      .then(() => {
+        console.log('[LoginService] Login window opened')
+      })
+      .catch((err: unknown) => {
+        console.error('[LoginService] Failed:', err)
+        handleResult({
+          success: false,
+          error: err instanceof Error ? err.message : '打开登录窗口失败',
+        })
+      })
+
+    // Set timeout for login
+    setTimeout(() => {
+      if (!resolved) {
+        console.log('[LoginService] Login timeout')
+        handleResult({
+          success: false,
+          error: '登录超时，请重试',
+        })
+      }
+    }, 300000) // 5 minutes timeout
   })
 }
 
