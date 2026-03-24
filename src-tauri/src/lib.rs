@@ -1,9 +1,13 @@
-use tauri::{Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{menu::Menu, Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
+            // Use native system menu (includes About on macOS and Help->About on Windows/Linux).
+            let menu = Menu::default(app.handle())?;
+            app.set_menu(menu)?;
+
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()
@@ -271,7 +275,7 @@ fn open_login_window(app: tauri::AppHandle) -> Result<(), String> {
     WebviewWindowBuilder::new(&app, "cas-login", webview_url)
         .title("登录 - 运动打卡")
         .inner_size(500.0, 700.0)
-      .incognito(true)
+        .incognito(true)
         .resizable(true)
         .center()
         .initialization_script(TOKEN_INTERCEPTOR_SCRIPT)

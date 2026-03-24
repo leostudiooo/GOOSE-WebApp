@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "GOOSE - 运动打卡系统",
+        "title": "GOOSE",
         "width": 800,
         "height": 600,
         "dragDropEnabled": false,
@@ -42,7 +42,8 @@
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
-      "icons/icon.ico"
+      "icons/icon.ico",
+      "icons/icon.png"
     ]
   }
 }
