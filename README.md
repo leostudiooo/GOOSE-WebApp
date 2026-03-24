@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="GOOSE Logo" src="https://github.com/leostudiooo/GOOSE/raw/main/img/GOOSE.webp" width=50% />
+<img alt="GOOSE Logo" src="https://github.com/leostudiooo/GOOSE/raw/main/img/GOOSE.webp" width=128 />
 
 # GOOSE WebApp 🪿
 
@@ -16,8 +16,6 @@
 </div>
 
 ## 🪿 关于
-
-<img alt="GOOSE WebApp 运行截图" width=682 src="https://github.com/user-attachments/assets/e10bb5e4-f241-4017-9f9e-2011fbd470ee"/>
 
 GOOSE WebApp 是 [GOOSE](https://github.com/leostudiooo/GOOSE) 项目的 Web 版本，为 SEU 本科生提供了一个现代化、直观的浏览器界面来记录和跟踪锻炼进度。通过 Terminal UI (TUI) 风格的设计，它提供了与原 Python TUI 版本相似的体验，同时具备现代 Web 应用的便利性。
 
