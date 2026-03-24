@@ -1,5 +1,15 @@
 <template>
   <div class="home-view" :class="{ 'is-tauri': isTauri }">
+    <div v-if="!isTauri" class="desktop-banner">
+      <span class="banner-icon">🚀</span>
+      <span class="banner-text">我们发布了桌面版 App！可以直接一键获取 Token。</span>
+      <a
+        href="https://github.com/leostudiooo/GOOSE-WebApp/releases"
+        target="_blank"
+        class="banner-link"
+        >立即下载</a
+      >
+    </div>
     <div class="app-window" :class="{ 'is-tauri': isTauri }">
       <div v-if="!isTauri" class="titlebar">
         <div class="window-controls">
@@ -459,6 +469,61 @@ function handleImportTrack(track: Track) {
 
 .home-view.is-tauri {
   padding: 0;
+}
+
+/* Desktop Banner Styling */
+.desktop-banner {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  animation: banner-glow 2s infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes banner-glow {
+  from {
+    box-shadow: 0 0 5px var(--color-primary-bg);
+    border-color: var(--color-border-subtle);
+  }
+
+  to {
+    box-shadow: 0 0 15px var(--color-primary-bg);
+    border-color: var(--color-primary);
+  }
+}
+
+.banner-icon {
+  font-size: 16px;
+}
+
+.banner-text {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.banner-link {
+  color: #fff;
+  background: var(--color-primary);
+  padding: 4px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.banner-link:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.4);
 }
 
 .app-window {
