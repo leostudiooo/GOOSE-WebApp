@@ -10,6 +10,9 @@
 ![Vue 3](https://img.shields.io/badge/vue-3.0%2B-green.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0%2B-blue.svg)
 
+现于 [Releases](https://github.com/leostudiooo/GOOSE-WebApp/releases/) 提供桌面版，可一键获取 token，免去手动抓取的麻烦。
+<img width="600" alt="GOOSE tauri 桌面版运行截图" src="https://github.com/user-attachments/assets/0a5e9f55-b2d8-4138-9246-a7a6f9798838" />
+
 </div>
 
 ## 🪿 关于
