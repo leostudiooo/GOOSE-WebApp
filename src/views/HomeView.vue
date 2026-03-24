@@ -11,12 +11,18 @@
         </div>
         <div class="titlebar-center">
           <span class="logo-emoji">🪿</span>
-          <span class="title"><a href="https://github.com/leostudiooo/GOOSE-WebApp"
-              target="_blank">GOOSE-WebApp</a></span>
+          <span class="title"
+            ><a href="https://github.com/leostudiooo/GOOSE-WebApp" target="_blank"
+              >GOOSE-WebApp</a
+            ></span
+          >
         </div>
         <div class="titlebar-right">
-          <button @click="toggleTheme" class="theme-toggle"
-            :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
+          <button
+            @click="toggleTheme"
+            class="theme-toggle"
+            :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+          >
             {{ isDark ? '☀️' : '🌙' }}
           </button>
         </div>
@@ -29,10 +35,18 @@
           </div>
           <div class="column upload-column">
             <Transition name="component-fade" mode="out-in">
-              <TrackSelector v-if="!showPRTSTracker" key="track-selector" @showPRTS="handleShowPRTS" />
+              <TrackSelector
+                v-if="!showPRTSTracker"
+                key="track-selector"
+                @showPRTS="handleShowPRTS"
+              />
               <div v-else key="prts-tracker" class="prts-wrapper">
-                <PRTSTracker :route-name="userStore.user.route" :load-route-boundary="loadRouteBoundary"
-                  @close="handleClosePRTS" @importTrack="handleImportTrack" />
+                <PRTSTracker
+                  :route-name="userStore.user.route"
+                  :load-route-boundary="loadRouteBoundary"
+                  @close="handleClosePRTS"
+                  @importTrack="handleImportTrack"
+                />
               </div>
             </Transition>
           </div>
@@ -41,10 +55,18 @@
 
       <!-- Upload controls at bottom of window -->
       <div class="upload-controls">
-        <button @click="handleValidation" class="upload-btn validation-btn" :disabled="!canValidate || isValidating">
+        <button
+          @click="handleValidation"
+          class="upload-btn validation-btn"
+          :disabled="!canValidate || isValidating"
+        >
           {{ isValidating ? '验证中...' : '验证配置' }}
         </button>
-        <button @click="handleUpload" class="upload-btn upload-btn-main" :disabled="!canUpload || isUploading">
+        <button
+          @click="handleUpload"
+          class="upload-btn upload-btn-main"
+          :disabled="!canUpload || isUploading"
+        >
           {{ isUploading ? '上传中...' : '上传记录' }}
         </button>
       </div>
@@ -53,9 +75,14 @@
     <footer v-if="!isTauri" class="footer">
       <p>
         基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a>、<a
-          href="https://github.com/leostudiooo/PRTS" target="_blank">PRTS</a>
+          href="https://github.com/leostudiooo/PRTS"
+          target="_blank"
+          >PRTS</a
+        >
         和
-        <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank">ML-SEU-Exercise-Helper</a>
+        <a href="https://github.com/midairlogn/ml-seu-exercise-helper" target="_blank"
+          >ML-SEU-Exercise-Helper</a
+        >
         开发 |
         <a href="https://opensource.org/licenses/GPL-3.0" target="_blank">GPL-3.0 License</a>
       </p>
@@ -546,14 +573,14 @@ function handleImportTrack(track: Track) {
   transition: all 0.4s ease;
 }
 
-.config-column>* {
+.config-column > * {
   background: var(--color-surface);
   padding: 0;
   margin: 0;
 }
 
-.upload-column>.prts-wrapper,
-.upload-column>.track-selector {
+.upload-column > .prts-wrapper,
+.upload-column > .track-selector {
   background: var(--color-surface);
   padding: 0;
   margin: 0;
@@ -718,11 +745,11 @@ function handleImportTrack(track: Track) {
 }
 
 /* Ensure column children have no extra margins */
-.config-column>*:not(:last-child) {
+.config-column > *:not(:last-child) {
   margin-bottom: 0;
 }
 
-.upload-column>* {
+.upload-column > * {
   margin: 0;
 }
 
