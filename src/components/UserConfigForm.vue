@@ -22,6 +22,17 @@
           </button>
         </div>
         <small>{{ isTauri ? '点击"自动获取"打开CAS登录窗口' : '需要在小程序中获取' }}</small>
+        <div v-if="!isTauri" class="desktop-guide">
+          <span>推荐：下载桌面版可一键获取 Token，简化操作流程。</span>
+          <a
+            class="desktop-link"
+            href="https://github.com/leostudiooo/GOOSE-WebApp/releases/latest"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            前往 Release 下载桌面 App
+          </a>
+        </div>
         <small v-if="loginError" class="error-text">{{ loginError }}</small>
       </div>
 
@@ -289,6 +300,28 @@ small {
 
 .error-text {
   color: var(--color-error, #ff6b6b);
+}
+
+.desktop-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px dashed var(--color-border-subtle);
+  background: var(--color-surface-interactive);
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.desktop-link {
+  color: var(--color-primary);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.desktop-link:hover {
+  color: var(--color-text);
 }
 
 .btn-now,
