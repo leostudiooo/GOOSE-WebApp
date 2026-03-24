@@ -48,6 +48,14 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: Inject version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "Injecting version: ${VERSION}"
+          VERSION="$VERSION" node -e "const fs=require('fs');const version=process.env.VERSION;const confPath='src-tauri/tauri.conf.json';const cargoPath='src-tauri/Cargo.toml';const conf=JSON.parse(fs.readFileSync(confPath,'utf8'));conf.version=version;fs.writeFileSync(confPath,JSON.stringify(conf,null,2)+'\\n');let cargo=fs.readFileSync(cargoPath,'utf8');cargo=cargo.replace(/(\\[package\\][\\s\\S]*?\\nversion\\s*=\\s*\")[^\"]+(\")/,`$1${version}$2`);fs.writeFileSync(cargoPath,cargo);"
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 

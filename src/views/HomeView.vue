@@ -55,20 +55,41 @@
 
       <!-- Upload controls at bottom of window -->
       <div class="upload-controls">
-        <button
-          @click="handleValidation"
-          class="upload-btn validation-btn"
-          :disabled="!canValidate || isValidating"
-        >
-          {{ isValidating ? '验证中...' : '验证配置' }}
-        </button>
-        <button
-          @click="handleUpload"
-          class="upload-btn upload-btn-main"
-          :disabled="!canUpload || isUploading"
-        >
-          {{ isUploading ? '上传中...' : '上传记录' }}
-        </button>
+        <div v-if="isTauri" class="footer-left">
+          <button
+            @click="handleCheckUpdate"
+            class="upload-btn check-update-btn"
+            :disabled="isCheckingUpdate"
+          >
+            {{ isCheckingUpdate ? '检查中...' : '检查更新' }}
+          </button>
+          <span v-if="updateMessage" :class="{ 'error-text': updateIsError }" class="update-status">
+            {{ updateMessage }}
+          </span>
+          <button
+            v-if="hasUpdate && latestReleaseUrl"
+            @click="handleOpenRelease"
+            class="open-release-btn"
+          >
+            (下载)
+          </button>
+        </div>
+        <div class="footer-right">
+          <button
+            @click="handleValidation"
+            class="upload-btn validation-btn"
+            :disabled="!canValidate || isValidating"
+          >
+            {{ isValidating ? '验证中...' : '验证配置' }}
+          </button>
+          <button
+            @click="handleUpload"
+            class="upload-btn upload-btn-main"
+            :disabled="!canUpload || isUploading"
+          >
+            {{ isUploading ? '上传中...' : '上传记录' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -107,6 +128,7 @@ import { isTauriEnvironment } from '@/utils/tauriEnv'
 import { UploadService, type UploadProgress } from '@/services/uploadService'
 import { APIClient } from '@/services/api'
 import { useToast } from 'vue-toastification'
+import { checkForAppUpdate, openReleasePage } from '@/services/updateService'
 import type { Track } from '@/types'
 import { getMaskedUserInfo } from '@/utils/privacyHelper'
 
@@ -124,6 +146,13 @@ const isTokenValidated = ref(false) // 跟踪 token 是否已成功验证
 const validatedApiClient = ref<APIClient | null>(null) // 存储已验证的 API client
 const validatedStudentId = ref<string>('') // 存储已验证的学生ID
 const isTauri = ref(false)
+
+// 检查更新相关状态
+const isCheckingUpdate = ref(false)
+const updateMessage = ref('')
+const updateIsError = ref(false)
+const hasUpdate = ref(false)
+const latestReleaseUrl = ref('')
 
 // 监听 token 变化，重置验证状态
 watch(
@@ -171,6 +200,38 @@ function handleShowPRTS() {
 
 function handleClosePRTS() {
   showPRTSTracker.value = false
+}
+
+// 检查更新
+async function handleCheckUpdate() {
+  if (isCheckingUpdate.value) return
+
+  isCheckingUpdate.value = true
+  updateMessage.value = ''
+  updateIsError.value = false
+  hasUpdate.value = false
+
+  try {
+    const result = await checkForAppUpdate()
+    latestReleaseUrl.value = result.releaseUrl
+
+    if (result.hasUpdate) {
+      hasUpdate.value = true
+      updateMessage.value = `发现新版本 v${result.latestVersion} (当前 v${result.currentVersion})`
+    } else {
+      updateMessage.value = `已是最新版本 v${result.currentVersion}`
+    }
+  } catch (error) {
+    updateIsError.value = true
+    updateMessage.value = error instanceof Error ? error.message : '检查更新失败'
+  } finally {
+    isCheckingUpdate.value = false
+  }
+}
+
+function handleOpenRelease() {
+  if (!latestReleaseUrl.value) return
+  openReleasePage(latestReleaseUrl.value)
 }
 
 // Computed properties for button states
@@ -770,8 +831,60 @@ function handleImportTrack(track: Track) {
   border-top: 1px solid var(--color-border-subtle);
   background: var(--color-surface-raised);
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
   gap: 12px;
-  justify-content: flex-end;
+}
+
+.footer-right {
+  display: flex;
+  gap: 12px;
+}
+
+.update-status {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.error-text {
+  color: var(--color-error, #ff6b6b);
+}
+
+.check-update-btn {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-border-subtle);
+  min-width: 70px;
+}
+
+.check-update-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.open-release-btn {
+  background: var(--color-error, #ff6b6b);
+  border: 1px solid var(--color-error, #ff6b6b);
+  padding: 2px 8px;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.open-release-btn:hover {
+  background: transparent;
+  color: var(--color-error, #ff6b6b);
 }
 
 .upload-btn {
