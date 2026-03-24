@@ -59,8 +59,8 @@ GOOSE WebApp 是一个 Vue 3 运动打卡系统，当前用户需要手动从 CA
    - 配置文件：`src-tauri/tauri.conf.json`
 
 3. **创建前端代码**
-   - `src/utils/tokenInterceptor.ts` - Token 拦截脚本
-   - `src/services/loginService.ts` - 登录窗口管理服务
+   - `src/utils/tauriEnv.ts` - Tauri 环境检测工具（无 Tauri 依赖）
+   - `src/services/loginService.ts` - 登录窗口管理服务（懒加载 Tauri API）
    - `src/types/index.ts` - 添加了 LoginResult 接口
    - `src/components/UserConfigForm.vue` - 添加了"自动获取"按钮
 
@@ -69,31 +69,27 @@ GOOSE WebApp 是一个 Vue 3 运动打卡系统，当前用户需要手动从 CA
    - 仅在 Tauri 环境下显示
    - 添加了加载状态和错误提示
 
+5. **Rust 后端与注入脚本**
+   - 已在 `src-tauri/src/lib.rs` 中实现 `token_captured` 和 `open_login_window` Tauri 命令
+   - 实现了登录窗口中的 JavaScript 注入与网络请求拦截（fetch/XHR/navigation 拦截）
+
 ### 待完成
 
-1. **Rust 后端代码**
-   - 需要修改 `src-tauri/src/lib.rs` 添加 Tauri 命令
-   - 实现 `token_captured` 命令处理
-   - 实现 JavaScript 注入到登录窗口
-
-2. **TypeScript 类型错误**
-   - `src/utils/tokenInterceptor.ts:115` 有类型错误
-   - `async` 参数类型需要修复
-
-3. **测试验证**
+1. **测试验证**
    - 运行 `pnpm tauri dev` 测试桌面应用
-   - 验证 token 抓取功能
+   - 验证 token 抓取功能在各主要平台上的表现（Windows / macOS / Linux）
+
+2. **后续优化（可选）**
+   - 根据实际使用情况优化错误处理与日志上报
+   - 根据用户反馈调整交互细节
 
 ## 关键文件说明
 
-### src/utils/tokenInterceptor.ts
+### src/utils/tauriEnv.ts
 
-Token 拦截脚本，功能：
+Tauri 环境检测工具，无 Tauri 依赖，可安全在 Web 构建中使用：
 
-- 劫持 `fetch()` 和 `XMLHttpRequest`
-- 监听所有网络请求
-- 检测 `tokenH5-cas` 回调
-- 提取 token 并派发事件
+- `isTauriEnvironment()` - 检测当前是否运行在 Tauri 桌面环境中
 
 ### src/services/loginService.ts
 
@@ -128,68 +124,7 @@ Tauri 配置文件，关键配置：
 
 ## 下一步工作
 
-### 1. 修复 TypeScript 类型错误
-
-```typescript
-// src/utils/tokenInterceptor.ts:115
-// 需要修复 async 参数类型
-XMLHttpRequest.prototype.open = function (
-  method: string,
-  url: string | URL,
-  async: boolean = true,  // 添加默认值
-  username?: string | null,
-  password?: string | null,
-): void {
-```
-
-### 2. 修改 Rust 后端代码
-
-文件：`src-tauri/src/lib.rs`
-
-需要添加：
-
-```rust
-#[tauri::command]
-fn token_captured(token: String, app: tauri::AppHandle) {
-    // 发送事件到主窗口
-    app.emit_all("token-captured", token).unwrap();
-
-    // 关闭登录窗口
-    if let Some(window) = app.get_window("cas-login") {
-        window.close().unwrap();
-    }
-}
-
-fn main() {
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![token_captured])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
-```
-
-### 3. 配置 JavaScript 注入
-
-需要在 Rust 后端实现页面加载后注入 JavaScript：
-
-- 监听 `tauri://webview-created` 事件
-- 使用 `window.eval()` 或自定义协议注入脚本
-
-### 4. 配置 CSP 和权限
-
-修改 `src-tauri/tauri.conf.json`：
-
-```json
-{
-  "app": {
-    "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://*.seu.edu.cn"
-    }
-  }
-}
-```
-
-### 5. 测试命令
+### 测试命令
 
 ```bash
 # 类型检查
@@ -238,4 +173,4 @@ pnpm tauri build
 如有问题，请参考：
 
 - Tauri 文档: https://v2.tauri.app
-- 项目 README: /Users/lilingfeng/Repositories/GOOSE-WebApp/README.md
+- 项目 README: README.md

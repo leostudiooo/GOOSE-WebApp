@@ -77,7 +77,7 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouteStore } from '@/stores/route'
 import ImageUploader from './ImageUploader.vue'
-import { isTauriEnvironment, openLoginWindow } from '@/services/loginService'
+import { isTauriEnvironment } from '@/utils/tauriEnv'
 
 const userStore = useUserStore()
 const routeStore = useRouteStore()
@@ -121,6 +121,7 @@ async function autoGetToken() {
   loginError.value = ''
 
   try {
+    const { openLoginWindow } = await import('@/services/loginService')
     const result = await openLoginWindow()
 
     if (result.success && result.token) {
