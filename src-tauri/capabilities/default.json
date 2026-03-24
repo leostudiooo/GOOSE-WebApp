@@ -3,6 +3,9 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": ["main", "cas-login"],
+  "remote": {
+    "urls": ["https://*.seu.edu.cn/*"]
+  },
   "permissions": [
     "core:default",
     "core:window:allow-close",

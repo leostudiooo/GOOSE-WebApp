@@ -1,17 +1,11 @@
-import { WebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core'
-
-const CAS_LOGIN_URL =
-  'https://auth.seu.edu.cn/dist/#/dist/main/login?service=https%3A%2F%2Ftyxsjpt.seu.edu.cn%2Fapi%2Foauth%2Fanno%2FtokenH5-cas'
 
 interface LoginResult {
   success: boolean
   token?: string
   error?: string
 }
-
-let loginWindow: WebviewWindow | null = null
 
 export function isTauriEnvironment(): boolean {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,66 +23,43 @@ export async function openLoginWindow(): Promise<LoginResult> {
   return new Promise((resolve) => {
     let resolved = false
 
-    const cleanup = () => {
-      if (loginWindow) {
-        loginWindow.close()
-        loginWindow = null
-      }
-    }
-
     const handleResult = (result: LoginResult) => {
       if (resolved) return
       resolved = true
-      cleanup()
+      // Clean up event listener
+      if (unlisten) unlisten()
       resolve(result)
     }
 
+    let unlisten: (() => void) | undefined
+
     try {
-      // Create login window
-      loginWindow = new WebviewWindow('cas-login', {
-        url: CAS_LOGIN_URL,
-        title: 'CAS 登录',
-        width: 500,
-        height: 700,
-        resizable: true,
-        center: true,
-      })
-
-      // Listen for window created event
-      loginWindow.once('tauri://created', () => {
-        console.log('[LoginService] Login window created')
-        // Inject token interceptor script via Rust
-        invoke('inject_token_interceptor')
-          .then(() => {
-            console.log('[LoginService] Token interceptor injected')
-          })
-          .catch((err: unknown) => {
-            console.error('[LoginService] Failed to inject token interceptor:', err)
-          })
-      })
-
-      // Listen for window close event
-      loginWindow.once('tauri://close-requested', () => {
-        console.log('[LoginService] Login window closed by user')
+      // Listen for token captured event from Rust backend
+      listen<string>('token-captured', (event) => {
+        console.log(
+          '[LoginService] Token received via event:',
+          event.payload.substring(0, 20) + '...',
+        )
         handleResult({
-          success: false,
-          error: '用户取消登录',
+          success: true,
+          token: event.payload,
         })
       })
-
-      // Listen for token captured event from Rust backend
-      listen('token-captured', (event) => {
-        console.log('[LoginService] Token received via event')
-        const token = event.payload as string
-        if (token) {
+        .then((unlistenFn) => {
+          unlisten = unlistenFn
+          // After listener is ready, open the login window via Rust command
+          return invoke('open_login_window')
+        })
+        .then(() => {
+          console.log('[LoginService] Login window opened')
+        })
+        .catch((err: unknown) => {
+          console.error('[LoginService] Failed:', err)
           handleResult({
-            success: true,
-            token: token,
+            success: false,
+            error: err instanceof Error ? err.message : '打开登录窗口失败',
           })
-        }
-      }).catch((err: unknown) => {
-        console.error('[LoginService] Failed to listen for token event:', err)
-      })
+        })
 
       // Set timeout for login
       setTimeout(() => {
@@ -101,7 +72,7 @@ export async function openLoginWindow(): Promise<LoginResult> {
         }
       }, 300000) // 5 minutes timeout
     } catch (error) {
-      console.error('[LoginService] Failed to create login window:', error)
+      console.error('[LoginService] Failed:', error)
       handleResult({
         success: false,
         error: error instanceof Error ? error.message : '创建登录窗口失败',
@@ -111,8 +82,5 @@ export async function openLoginWindow(): Promise<LoginResult> {
 }
 
 export function closeLoginWindow(): void {
-  if (loginWindow) {
-    loginWindow.close()
-    loginWindow = null
-  }
+  // Note: closing is handled by Rust when token is captured
 }
