@@ -1,0 +1,49 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "GOOSE",
+  "version": "0.1.0",
+  "identifier": "com.goose.sports-tracker",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "GOOSE",
+        "width": 800,
+        "height": 600,
+        "dragDropEnabled": false,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; connect-src 'self' https://*.seu.edu.cn"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "homepage": "https://github.com/leostudiooo/GOOSE-WebApp",
+    "shortDescription": "运动打卡系统（GOOSE WebApp）",
+    "copyright": "基于 GOOSE / PRTS / ML-SEU-Exercise-Helper 开发 | GPL-3.0 | 本软件按\"原样\"提供，不附带任何担保。",
+    "resources": [
+      "Credits.rtf"
+    ],
+    "macOS": {
+      "infoPlist": "Info.plist"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
+  }
+}

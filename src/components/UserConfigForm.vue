@@ -4,14 +4,25 @@
     <div class="config-content">
       <div class="form-group">
         <label for="token">Token:</label>
-        <input
-          id="token"
-          v-model="userStore.user.token"
-          type="text"
-          placeholder="your.token.here"
-          class="form-control"
-        />
-        <small>需要在小程序中获取</small>
+        <div class="token-container">
+          <input
+            id="token"
+            v-model="userStore.user.token"
+            type="text"
+            placeholder="your.token.here"
+            class="form-control"
+          />
+          <button
+            v-if="isTauri"
+            @click="autoGetToken"
+            class="btn-auto-token"
+            :disabled="isLoggingIn"
+          >
+            {{ isLoggingIn ? '登录中...' : '自动获取' }}
+          </button>
+        </div>
+        <small>{{ isTauri ? '点击"自动获取"打开CAS登录窗口' : '需要在小程序中获取' }}</small>
+        <small v-if="loginError" class="error-text">{{ loginError }}</small>
       </div>
 
       <div class="form-group">
@@ -66,11 +77,15 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouteStore } from '@/stores/route'
 import ImageUploader from './ImageUploader.vue'
+import { isTauriEnvironment } from '@/utils/tauriEnv'
 
 const userStore = useUserStore()
 const routeStore = useRouteStore()
 
 const localDateTime = ref('')
+const isTauri = ref(false)
+const isLoggingIn = ref(false)
+const loginError = ref('')
 
 function formatDateTimeLocal(isoString: string): string {
   const date = new Date(isoString)
@@ -99,9 +114,35 @@ function onRouteChange() {
   console.log('UserConfigForm: Route changed to:', userStore.user.route)
 }
 
+async function autoGetToken() {
+  if (isLoggingIn.value) return
+
+  isLoggingIn.value = true
+  loginError.value = ''
+
+  try {
+    const { openLoginWindow } = await import('@/services/loginService')
+    const result = await openLoginWindow()
+
+    if (result.success && result.token) {
+      userStore.updateToken(result.token)
+      console.log('Token获取成功')
+    } else {
+      loginError.value = result.error || '获取Token失败'
+    }
+  } catch (error) {
+    console.error('Auto login error:', error)
+    loginError.value = error instanceof Error ? error.message : '登录过程出错'
+  } finally {
+    isLoggingIn.value = false
+  }
+}
+
 onMounted(async () => {
   localDateTime.value = formatDateTimeLocal(userStore.user.dateTime)
   await routeStore.loadRoutes()
+
+  isTauri.value = isTauriEnvironment()
 })
 </script>
 
@@ -158,6 +199,11 @@ onMounted(async () => {
     padding: 8px 16px;
     font-size: 13px;
   }
+
+  .btn-auto-token {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
 }
 
 label {
@@ -186,6 +232,17 @@ label {
     background-color 0.2s,
     box-shadow 0.2s;
   box-sizing: border-box;
+}
+
+.token-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.token-container .form-control {
+  flex: 1;
+  min-width: 0;
 }
 
 .datetime-container {
@@ -230,7 +287,12 @@ small {
     'Roboto Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace, sans-serif;
 }
 
-.btn-now {
+.error-text {
+  color: var(--color-error, #ff6b6b);
+}
+
+.btn-now,
+.btn-auto-token {
   padding: 6px 12px;
   background: var(--color-primary);
   color: var(--color-background);
@@ -245,11 +307,18 @@ small {
   transition: all 0.2s;
   flex-shrink: 0;
   height: fit-content;
+  white-space: nowrap;
 }
 
-.btn-now:hover {
+.btn-now:hover,
+.btn-auto-token:hover {
   background: var(--color-background);
   color: var(--color-primary);
+}
+
+.btn-auto-token:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .images-section {

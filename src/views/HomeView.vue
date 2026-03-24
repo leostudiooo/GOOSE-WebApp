@@ -1,7 +1,7 @@
 <template>
-  <div class="home-view">
-    <div class="app-window">
-      <div class="titlebar">
+  <div class="home-view" :class="{ 'is-tauri': isTauri }">
+    <div class="app-window" :class="{ 'is-tauri': isTauri }">
+      <div v-if="!isTauri" class="titlebar">
         <div class="window-controls">
           <div class="traffic-lights">
             <span class="traffic-light close"></span>
@@ -17,13 +17,15 @@
             ></span
           >
         </div>
-        <button
-          @click="toggleTheme"
-          class="theme-toggle"
-          :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
-        >
-          {{ isDark ? '☀️' : '🌙' }}
-        </button>
+        <div class="titlebar-right">
+          <button
+            @click="toggleTheme"
+            class="theme-toggle"
+            :title="isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+          >
+            {{ isDark ? '☀️' : '🌙' }}
+          </button>
+        </div>
       </div>
 
       <div class="window-content">
@@ -70,7 +72,7 @@
       </div>
     </div>
 
-    <footer class="footer">
+    <footer v-if="!isTauri" class="footer">
       <p>
         基于 <a href="https://github.com/leostudiooo/GOOSE" target="_blank">GOOSE</a>、<a
           href="https://github.com/leostudiooo/PRTS"
@@ -101,6 +103,7 @@ import TrackSelector from '@/components/TrackSelector.vue'
 import PRTSTracker from '@/components/PRTSTracker.vue'
 import { loadRouteBoundary } from '@/utils/boundaryLoader'
 import { VerificationService } from '@/services/verificationService'
+import { isTauriEnvironment } from '@/utils/tauriEnv'
 import { UploadService, type UploadProgress } from '@/services/uploadService'
 import { APIClient } from '@/services/api'
 import { useToast } from 'vue-toastification'
@@ -120,6 +123,7 @@ const validationResult = ref<string>('')
 const isTokenValidated = ref(false) // 跟踪 token 是否已成功验证
 const validatedApiClient = ref<APIClient | null>(null) // 存储已验证的 API client
 const validatedStudentId = ref<string>('') // 存储已验证的学生ID
+const isTauri = ref(false)
 
 // 监听 token 变化，重置验证状态
 watch(
@@ -352,6 +356,7 @@ watch(showPRTSTracker, (newVal) => {
 })
 
 onMounted(async () => {
+  isTauri.value = isTauriEnvironment()
   // Load saved theme
   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'auto' | null
   if (savedTheme) {
@@ -391,6 +396,10 @@ function handleImportTrack(track: Track) {
   overflow: hidden;
 }
 
+.home-view.is-tauri {
+  padding: 0;
+}
+
 .app-window {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border-subtle);
@@ -406,6 +415,34 @@ function handleImportTrack(track: Track) {
   transition: all 0.4s ease;
   min-height: 0;
   max-height: 100%;
+}
+
+.app-window.is-tauri {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.tauri-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-bottom: 4px;
+}
+
+.tauri-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tauri-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .titlebar {
@@ -435,11 +472,17 @@ function handleImportTrack(track: Track) {
   letter-spacing: 1px;
 }
 
-.theme-toggle {
+.titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
+}
+
+.theme-toggle {
   background: var(--color-surface-interactive);
   border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
