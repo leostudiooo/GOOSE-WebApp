@@ -17,14 +17,17 @@ jobs:
         include:
           - os: windows-latest
             bundle: nsis
+            target: ''
             artifact_name: windows-exe
             artifact_path: src-tauri/target/release/bundle/nsis/*.exe
           - os: macos-latest
             bundle: dmg
+            target: universal-apple-darwin
             artifact_name: macos-dmg
             artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
           - os: ubuntu-22.04
             bundle: appimage
+            target: ''
             artifact_name: linux-appimage
             artifact_path: src-tauri/target/release/bundle/appimage/*.AppImage
 
@@ -48,6 +51,10 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Add macOS universal targets
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -65,7 +72,12 @@ jobs:
       - name: Build Tauri bundle
         env:
           CI: true
-        run: pnpm tauri build --bundles ${{ matrix.bundle }}
+        run: |
+          if [ -n "${{ matrix.target }}" ]; then
+            pnpm tauri build --bundles ${{ matrix.bundle }} --target ${{ matrix.target }}
+          else
+            pnpm tauri build --bundles ${{ matrix.bundle }}
+          fi
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
